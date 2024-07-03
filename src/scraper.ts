@@ -55,19 +55,32 @@ function scrollUp(scrollContainer: HTMLElement) {
   scrollContainer.scrollTop = 0;
 }
 
-function main() {
-  const messageDiv = findMessageDiv();
-  if (!messageDiv) {
-    console.error("Could not find message div");
-    return;
+function getScrollableAndMessageContainer(): {
+  /** Scrollable div that contains all the messages */
+  scrollContainer: HTMLElement;
+  /** Direct parent of all the messages */
+  messageDiv: HTMLElement;
+} {
+  const outerContainer = findMessageDiv();
+  if (!outerContainer) {
+    throw new Error("Could not find message container");
   }
-  const scrollContainer = findScrollableMessageContainer(messageDiv);
+  const scrollContainer = findScrollableMessageContainer(outerContainer);
   if (!scrollContainer) {
-    console.error("Could not find scrollable message container");
-    return;
+    throw new Error("Could not find scrollable message container");
   }
+  const messageDiv = scrollContainer.firstElementChild;
+  if (!(messageDiv instanceof HTMLElement)) {
+    throw new Error("Could not find message div");
+  }
+  return { scrollContainer, messageDiv };
+}
+
+function main() {
+  const { scrollContainer, messageDiv } = getScrollableAndMessageContainer();
   console.log(scrollContainer);
   scrollUp(scrollContainer);
+  console.log(messageDiv);
 }
 
 main();
