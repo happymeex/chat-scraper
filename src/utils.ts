@@ -20,7 +20,7 @@ export function findFirstDescendant(
 ): HTMLElement | null {
   if (domElement instanceof HTMLElement && includeSelf && validator(domElement))
     return domElement;
-  for (let child of domElement.children) {
+  for (let child of Array.from(domElement.children)) {
     const result = findFirstDescendant(child, true, validator);
     if (result) return result;
   }

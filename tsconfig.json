@@ -4,7 +4,8 @@
     "target": "es6",
     "strict": true,
     "outDir": "./dist",
-    "module": "ESNext"
+    "module": "ESNext",
+    "lib": ["DOM", "ES2020"]
   },
   "exclude": ["./node_modules", "./dist"]
 }
