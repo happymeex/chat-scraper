@@ -3,16 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc && node scripts/clipboard.mjs"
+    "build": "npm run bundle && node scripts/clipboard.mjs",
+    "bundle": "esbuild src/main.ts --bundle --minify --outfile=dist/main.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
-  "dependencies": {
-    "typescript": "^5.5.3"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "clipboardy": "^4.0.0"
+    "typescript": "^5.5.3",
+    "clipboardy": "^4.0.0",
+    "esbuild": "0.23.0"
   }
 }

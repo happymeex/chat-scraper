@@ -3,6 +3,8 @@
   "compilerOptions": {
     "target": "es6",
     "strict": true,
-    "outDir": "./dist"
-  }
+    "outDir": "./dist",
+    "module": "ESNext"
+  },
+  "exclude": ["./node_modules", "./dist"]
 }

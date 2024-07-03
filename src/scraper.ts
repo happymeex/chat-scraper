@@ -1,5 +1,6 @@
+import { findFirstDescendant } from "./utils";
+
 /**
- *
  * @returns div containing the message panel
  */
 function findMessageDiv(): HTMLElement | null {
@@ -26,36 +27,7 @@ function findScrollableMessageContainer(
   });
 }
 
-/**
- * Finds the first HTML descendant of the given element that matches the given validator.
- *
- * @param domElement the element
- * @param includeSelf true if the element itself should be included
- * @param validator a function that returns true if the element matches
- * @returns
- */
-function findFirstDescendant(
-  domElement: Element,
-  includeSelf: boolean,
-  validator: (elt: HTMLElement) => boolean
-): HTMLElement | null {
-  if (domElement instanceof HTMLElement && includeSelf && validator(domElement))
-    return domElement;
-  for (let child of domElement.children) {
-    const result = findFirstDescendant(child, true, validator);
-    if (result) return result;
-  }
-  return null;
-}
-
-/**
- * Scrolls the given view of the given container to the top.
- */
-function scrollUp(scrollContainer: HTMLElement) {
-  scrollContainer.scrollTop = 0;
-}
-
-function getScrollableAndMessageContainer(): {
+export function getScrollableAndMessageContainer(): {
   /** Scrollable div that contains all the messages */
   scrollContainer: HTMLElement;
   /** Direct parent of all the messages */
@@ -75,12 +47,3 @@ function getScrollableAndMessageContainer(): {
   }
   return { scrollContainer, messageDiv };
 }
-
-function main() {
-  const { scrollContainer, messageDiv } = getScrollableAndMessageContainer();
-  console.log(scrollContainer);
-  scrollUp(scrollContainer);
-  console.log(messageDiv);
-}
-
-main();
