@@ -1,5 +1,5 @@
 import { getScrollableAndMessageContainer } from "./scraper";
-import { writeToNewWindow } from "./utils";
+import { writeJSONToNewWindow } from "./utils";
 import {
   getMessageContent,
   isMessageDiv,
@@ -74,7 +74,7 @@ function scrapeFactory() {
     const process = setInterval(() => {
       if (processLastMessage() || window.innerWidth < 768) {
         console.log(processedMessages);
-        writeToNewWindow(JSON.stringify(processedMessages));
+        writeJSONToNewWindow(processedMessages);
         console.log("Done!");
         clearInterval(process);
       }
@@ -84,7 +84,7 @@ function scrapeFactory() {
 
   const stopScrape = () => {
     if (scrapeProcess) {
-      writeToNewWindow(JSON.stringify(processedMessages));
+      writeJSONToNewWindow(processedMessages);
       console.log("Stopped scraping!");
       clearInterval(scrapeProcess);
       scrapeProcess = null;

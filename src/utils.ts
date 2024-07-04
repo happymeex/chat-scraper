@@ -20,17 +20,14 @@ export function findFirstDescendant(
   return null;
 }
 
-/**
- * Opens a new window and writes the given text to it.
- *
- * @throws if the window cannot be opened
- */
-export function writeToNewWindow(text: string) {
-  const win = window.open("about:blank", "_blank");
-  if (win) {
-    win.document.write(text);
-    win.document.close();
-  } else {
-    throw new Error("Could not open new window");
-  }
+export function writeJSONToNewWindow(jsonObject: any) {
+  const jsonString = JSON.stringify(jsonObject, null, 2);
+  const jsonBlob = new Blob([jsonString], { type: "application/json" });
+  const url = URL.createObjectURL(jsonBlob);
+  window.open(url, "_blank");
+
+  // revoke the object URL after a delay to release memory
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 1000);
 }
