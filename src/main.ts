@@ -9,7 +9,7 @@ import {
 } from "./messageParser";
 import { makeUIPanel } from "./ui";
 
-const POLLING_TIME = 600;
+const POLLING_TIME = 400;
 
 function main() {
   const { startScrape, stopScrape } = scrapeFactory();
