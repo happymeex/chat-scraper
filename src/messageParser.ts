@@ -34,6 +34,7 @@ export enum MessageParseStatus {
   NOT_A_MESSAGE,
   UNKNOWN_FORMAT,
   EMPTY_MESSAGE,
+  TERMINATE,
 }
 
 /**
@@ -51,12 +52,14 @@ export function getMessageContent(
   if (textLabels.length === 0) return [null, MessageParseStatus.EMPTY_MESSAGE];
 
   if (textLabels.length === 1) {
-    const senderName = textLabels[0].text;
+    const text = textLabels[0].text;
+    if (text === "You are now connected on Messenger")
+      return [null, MessageParseStatus.TERMINATE];
     return [
       {
         time: null,
         replyInfo: null,
-        senderName: senderName === "You sent" ? "You" : senderName,
+        senderName: text === "You sent" ? "You" : text,
         body: "",
         isImage: true,
       },
@@ -161,4 +164,15 @@ function getMessageTextIncompleteLabels(node: Node): TextLabel[] {
 
 export function isMessageDiv(elt: Element): boolean {
   return elt instanceof HTMLDivElement && elt.attributes.length === 0;
+}
+
+/**
+ * Returns true if the element is a profile banner at the beginning of a chat (termination condition)
+ */
+export function isProfileBanner(elt: Element): boolean {
+  return (
+    elt instanceof HTMLDivElement &&
+    elt.classList.contains("html-div") &&
+    elt.getAttribute("role") === "presentation"
+  );
 }

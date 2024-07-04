@@ -5,6 +5,7 @@ import {
   isMessageDiv,
   Message,
   MessageParseStatus,
+  isProfileBanner,
 } from "./messageParser";
 
 const POLLING_TIME = 600;
@@ -12,13 +13,11 @@ const POLLING_TIME = 600;
 function main() {
   const { scrollContainer, messageDiv } = getScrollableAndMessageContainer();
   scrollUp(scrollContainer);
-  let activeMessageDivs = Array.from(messageDiv.children);
   const processedMessages: (Message | null)[] = [];
-
   const processedDivs = new Set<Element>();
   let currentDivToProcess = messageDiv.lastElementChild;
-  // Returns true if should terminate, otherwise false
 
+  // Returns true if should terminate, otherwise false
   const tryMovingToPreviousSiblingMessageDiv = () => {
     if (currentDivToProcess === null) {
       return true;
@@ -27,6 +26,9 @@ function main() {
     if (prevSibling === null) {
       return true;
     } else if (!isMessageDiv(prevSibling)) {
+      if (isProfileBanner(prevSibling)) {
+        return true;
+      }
       prevSibling.scrollIntoView(false);
       return false;
     } else {
@@ -34,12 +36,17 @@ function main() {
       return false;
     }
   };
+
+  // Returns true if should terminate, otherwise false
   const processLastMessage = () => {
     if (currentDivToProcess === null) {
       return true;
     }
     const [message, status] = getMessageContent(currentDivToProcess);
-    if (status === MessageParseStatus.NOT_A_MESSAGE) {
+    if (
+      status === MessageParseStatus.NOT_A_MESSAGE ||
+      status === MessageParseStatus.TERMINATE
+    ) {
       return true;
     }
     if (
