@@ -41,3 +41,27 @@ export function writeToNewWindow(text: string) {
     throw new Error("Could not open new window");
   }
 }
+
+export function pollingProcess(
+  action: () => void,
+  haltCondition: () => boolean,
+  onFinish: () => void,
+  pollingInterval: number,
+  timeout: number = 60 * 60 * 1000
+) {
+  const startTime = Date.now();
+  const process = setInterval(() => {
+    if (haltCondition() || Date.now() - startTime > timeout) {
+      clearInterval(process);
+      onFinish();
+    } else {
+      try {
+        action();
+      } catch (e) {
+        clearInterval(process);
+        console.error(e);
+        onFinish();
+      }
+    }
+  }, pollingInterval);
+}

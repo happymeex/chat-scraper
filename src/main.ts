@@ -1,8 +1,8 @@
 import { getScrollableAndMessageContainer } from "./scraper";
-import { scrollUp, writeToNewWindow } from "./utils";
+import { scrollUp, writeToNewWindow, pollingProcess } from "./utils";
 import { getMessageContent, Message } from "./messageParser";
 
-const POLLING_TIME = 1000;
+const POLLING_TIME = 5000;
 
 function main() {
   const { scrollContainer, messageDiv } = getScrollableAndMessageContainer();
@@ -34,9 +34,20 @@ function main() {
   const hydrateActiveMessages = () => {
     activeMessageDivs = Array.from(messageDiv.children);
   };
-  const output = JSON.stringify(processedMessages, null, 2);
-  writeToNewWindow(output);
-  console.log(output);
+
+  pollingProcess(
+    () => {
+      processMessages();
+      hydrateActiveMessages();
+    },
+    () => activeMessageDivs.length === 0,
+    () => {
+      const output = JSON.stringify(processedMessages, null, 2);
+      writeToNewWindow(output);
+      console.log(output);
+    },
+    POLLING_TIME
+  );
 }
 
 main();
