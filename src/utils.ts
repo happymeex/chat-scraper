@@ -33,7 +33,7 @@ export function findFirstDescendant(
  * @throws if the window cannot be opened
  */
 export function writeToNewWindow(text: string) {
-  const win = window.open("about:blank", "_blank");
+  const win = window.open("", "_blank");
   if (win) {
     win.document.write(text);
     win.document.close();

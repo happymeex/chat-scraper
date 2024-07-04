@@ -20,7 +20,7 @@ type ReplyInfo = {
   /** Text of message replied to (or preview thereof) */
   originalMessage: string;
 };
-type Message = {
+export type Message = {
   time: string | null;
   /** Info if this message was a reply, null if not */
   replyInfo: ReplyInfo | null;
