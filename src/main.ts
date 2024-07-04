@@ -17,7 +17,7 @@ function main() {
 }
 
 function scrapeFactory() {
-  const processedMessages: (Message | null)[] = [];
+  let processedMessages: (Message | null)[] = [];
 
   let scrapeProcess: number | null = null;
   const startScrape = () => {
@@ -92,6 +92,7 @@ function scrapeFactory() {
       console.log("Stopped scraping!");
       clearInterval(scrapeProcess);
       scrapeProcess = null;
+      processedMessages = [];
     }
   };
 
