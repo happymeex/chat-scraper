@@ -22,4 +22,8 @@ and then write the result into your clipboard.
 Next, go to your browser and add a bookmark,
 pasting the bookmarklet as the URL.
 Finally, you can open a chat window Facebook Messenger and click the bookmark.
-This will [TODO]
+This will run the bookmarklet script in the background for a while;
+don't touch it until it finishes, at which point
+it will open a blank browser window and dump a JSON of chat message data into it.
+
+This is still a prototype, there are TODOs left to handle.
