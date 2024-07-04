@@ -33,8 +33,9 @@ export function makeUIPanel(
 }
 
 const borderWhite = "#848484";
-const primaryDark = "#222222";
+const darkGray = "#222222";
 const offWhite = "#dfdfdf";
+const primary = "#4d9648";
 const panelCSS = `
 .chat-scraper-panel {
     position: absolute;
@@ -43,7 +44,7 @@ const panelCSS = `
     left: 10px;
     border-radius: 4px;
     border: 1px solid ${borderWhite};
-    background-color: ${primaryDark};
+    background-color: ${darkGray};
     padding: 10px 20px;
     font-size: 16px;
 }
@@ -51,8 +52,26 @@ const panelCSS = `
     color: ${offWhite};
 }
 .chat-scraper-panel h1 {
+    font-size: 1.5rem;
     font-weight: bold;
-}`;
+}
+.scrape-button {
+    margin-top: 10px;
+    background-color: ${primary};
+    font-weight: bold;
+    border-radius: 2px;
+    border: 1px solid ${borderWhite};
+    padding: 10px 20px;
+    color: white;
+    width: 100%;
+    font-size: 1rem;
+}
+.scrape-button:hover {
+    transition: background-color 0.15s ease-in-out;
+    cursor: pointer;
+    background-color: ${primary}cc;
+}
+`;
 
 /**
  * Makes a div draggable across the screen
