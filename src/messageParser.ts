@@ -48,7 +48,6 @@ export function getMessageContent(
 ): [Message | null, MessageParseStatus] {
   if (!isMessageDiv(elt)) return [null, MessageParseStatus.NOT_A_MESSAGE];
   const textLabels = getMessageTextIncompleteLabels(elt);
-  const copy = textLabels.map((label) => label.text);
 
   let time: string | null = null;
   while (textLabels.length > 0 && textLabels[0].type === TextType.TIME) {
@@ -74,9 +73,6 @@ export function getMessageContent(
     ];
   }
 
-  const messageBody = textLabels[textLabels.length - 1].text;
-  textLabels.pop();
-
   let senderName: string | null = null;
   let replyInfo: ReplyInfo | null = null;
   // check if it's a reply by getting index of "Original message:"
@@ -88,7 +84,7 @@ export function getMessageContent(
     let addresseeName: string | null = null;
     // regex to extract the sender and addressee
     const rx = RegExp("^(.*) replied to (.*)$");
-    const match = textLabels[repliedTo - 1].text.match(rx);
+    const match = textLabels[0].text.match(rx);
     if (match) {
       senderName = match[1];
       addresseeName = match[2];
@@ -96,13 +92,24 @@ export function getMessageContent(
     if (addresseeName === null || senderName === null) {
       return [null, MessageParseStatus.UNKNOWN_FORMAT];
     }
-    const originalMessage = textLabels
-      .splice(repliedTo + 1) // avoid "Original message:"
-      .map((label) => label.text)
-      .join("");
 
-    textLabels.pop(); // remove "Original message:"
-    textLabels.pop(); // remove "X replied to Y"
+    textLabels.shift(); // remove "X replied to Y"
+    // remove extra stuff present in edited replies
+    while (
+      textLabels.length > 0 &&
+      textLabels[0].text !== "Original message:"
+    ) {
+      textLabels.shift();
+    }
+    if (textLabels.length < 3) return [null, MessageParseStatus.UNKNOWN_FORMAT];
+    textLabels.shift(); // remove "Original message:"
+
+    let originalMessage = textLabels[0].text;
+    textLabels.shift();
+    if (textLabels[0].text === "…") {
+      originalMessage += "…";
+      textLabels.shift();
+    }
 
     replyInfo = {
       addresseeName,
@@ -111,10 +118,12 @@ export function getMessageContent(
   } else {
     if (textLabels.length === 0)
       return [null, MessageParseStatus.UNKNOWN_FORMAT];
-    senderName = textLabels[textLabels.length - 1].text;
+    senderName = textLabels[0].text;
     senderName = senderName === "You sent" ? "You" : senderName;
-    textLabels.pop();
+    textLabels.shift();
   }
+
+  const messageBody = textLabels.map((label) => label.text).join(" ");
 
   return [
     {
