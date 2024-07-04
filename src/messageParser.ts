@@ -159,6 +159,6 @@ function getMessageTextIncompleteLabels(node: Node): TextLabel[] {
   return [];
 }
 
-function isMessageDiv(elt: Element): boolean {
-  return elt instanceof HTMLDivElement && elt.getAttribute("role") === null;
+export function isMessageDiv(elt: Element): boolean {
+  return elt instanceof HTMLDivElement && elt.attributes.length === 0;
 }

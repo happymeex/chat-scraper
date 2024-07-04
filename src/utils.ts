@@ -33,35 +33,11 @@ export function findFirstDescendant(
  * @throws if the window cannot be opened
  */
 export function writeToNewWindow(text: string) {
-  const win = window.open("", "_blank");
+  const win = window.open("about:blank", "_blank");
   if (win) {
     win.document.write(text);
     win.document.close();
   } else {
     throw new Error("Could not open new window");
   }
-}
-
-export function pollingProcess(
-  action: () => void,
-  haltCondition: () => boolean,
-  onFinish: () => void,
-  pollingInterval: number,
-  timeout: number = 60 * 60 * 1000
-) {
-  const startTime = Date.now();
-  const process = setInterval(() => {
-    if (haltCondition() || Date.now() - startTime > timeout) {
-      clearInterval(process);
-      onFinish();
-    } else {
-      try {
-        action();
-      } catch (e) {
-        clearInterval(process);
-        console.error(e);
-        onFinish();
-      }
-    }
-  }, pollingInterval);
 }

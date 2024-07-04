@@ -2,11 +2,12 @@ import { getScrollableAndMessageContainer } from "./scraper";
 import { scrollUp, writeToNewWindow } from "./utils";
 import {
   getMessageContent,
+  isMessageDiv,
   Message,
   MessageParseStatus,
 } from "./messageParser";
 
-const POLLING_TIME = 1000;
+const POLLING_TIME = 600;
 
 function main() {
   const { scrollContainer, messageDiv } = getScrollableAndMessageContainer();
@@ -14,37 +15,53 @@ function main() {
   let activeMessageDivs = Array.from(messageDiv.children);
   const processedMessages: (Message | null)[] = [];
 
+  const processedDivs = new Set<Element>();
   let currentDivToProcess = messageDiv.lastElementChild;
   // Returns true if should terminate, otherwise false
-  const processLastMessage = () => {
-    console.log("processing message");
+
+  const tryMovingToPreviousSiblingMessageDiv = () => {
     if (currentDivToProcess === null) {
-      console.log("null now");
+      return true;
+    }
+    const prevSibling = currentDivToProcess.previousElementSibling;
+    if (prevSibling === null) {
+      return true;
+    } else if (!isMessageDiv(prevSibling)) {
+      prevSibling.scrollIntoView(false);
+      return false;
+    } else {
+      currentDivToProcess = prevSibling;
+      return false;
+    }
+  };
+  const processLastMessage = () => {
+    if (currentDivToProcess === null) {
       return true;
     }
     const [message, status] = getMessageContent(currentDivToProcess);
     if (status === MessageParseStatus.NOT_A_MESSAGE) {
-      console.log("Not a message");
       return true;
     }
-    if (status === MessageParseStatus.EMPTY_MESSAGE) {
-      // out of view
-      currentDivToProcess.scrollIntoView();
-      console.log("wait! empty message");
+    if (
+      status === MessageParseStatus.EMPTY_MESSAGE ||
+      processedDivs.has(currentDivToProcess)
+    ) {
+      if (tryMovingToPreviousSiblingMessageDiv()) return true;
       return false;
     } else {
-      console.log("Processed message: ", message);
       processedMessages.push(message);
-      currentDivToProcess = currentDivToProcess.previousElementSibling;
+      processedDivs.add(currentDivToProcess);
+      if (tryMovingToPreviousSiblingMessageDiv()) return true;
       return false;
     }
   };
 
   const process = setInterval(() => {
-    if (processLastMessage()) {
-      clearInterval(process);
+    if (processLastMessage() || window.innerWidth < 768) {
+      console.log(processedMessages);
       writeToNewWindow(JSON.stringify(processedMessages));
       console.log("Done!");
+      clearInterval(process);
     }
   }, POLLING_TIME);
 }
