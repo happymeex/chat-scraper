@@ -26,3 +26,18 @@ export function findFirstDescendant(
   }
   return null;
 }
+
+/**
+ * Opens a new window and writes the given text to it.
+ *
+ * @throws if the window cannot be opened
+ */
+export function writeToNewWindow(text: string) {
+  const win = window.open("about:blank", "_blank");
+  if (win) {
+    win.document.write(text);
+    win.document.close();
+  } else {
+    throw new Error("Could not open new window");
+  }
+}
