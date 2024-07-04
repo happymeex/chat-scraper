@@ -29,26 +29,39 @@ export type Message = {
   isImage: boolean;
 };
 
+export enum MessageParseStatus {
+  SUCCESS,
+  NOT_A_MESSAGE,
+  UNKNOWN_FORMAT,
+  EMPTY_MESSAGE,
+}
+
 /**
- * Retrieves the message content from a given Node.
+ * Retrieves the message content from a given element.
  *
- * @param node the Node containing the message content.
+ * @param elt the element containing the message content.
  * @return the extracted message content or null if there was an error.
  */
-export function getMessageContent(node: Node): Message | null {
-  const textLabels = getMessageTextIncompleteLabels(node);
+export function getMessageContent(
+  elt: Element
+): [Message | null, MessageParseStatus] {
+  if (!isMessageDiv(elt)) return [null, MessageParseStatus.NOT_A_MESSAGE];
+  const textLabels = getMessageTextIncompleteLabels(elt);
 
-  if (textLabels.length === 0) return null;
+  if (textLabels.length === 0) return [null, MessageParseStatus.EMPTY_MESSAGE];
 
   if (textLabels.length === 1) {
     const senderName = textLabels[0].text;
-    return {
-      time: null,
-      replyInfo: null,
-      senderName: senderName === "You sent" ? "You" : senderName,
-      body: "",
-      isImage: true,
-    };
+    return [
+      {
+        time: null,
+        replyInfo: null,
+        senderName: senderName === "You sent" ? "You" : senderName,
+        body: "",
+        isImage: true,
+      },
+      MessageParseStatus.SUCCESS,
+    ];
   }
 
   const messageBody = textLabels[textLabels.length - 1].text;
@@ -60,7 +73,7 @@ export function getMessageContent(node: Node): Message | null {
   const repliedTo = textLabels.findIndex(
     (label) => label.type === TextType.REPLY_INFO
   );
-  if (repliedTo === 0) return null; // reply missing sender/addressee info
+  if (repliedTo === 0) return [null, MessageParseStatus.UNKNOWN_FORMAT]; // reply missing sender/addressee info
   if (repliedTo > 0) {
     let addresseeName: string | null = null;
     // regex to extract the sender and addressee
@@ -71,7 +84,7 @@ export function getMessageContent(node: Node): Message | null {
       addresseeName = match[2];
     }
     if (addresseeName === null || senderName === null) {
-      return null;
+      return [null, MessageParseStatus.UNKNOWN_FORMAT];
     }
     const originalMessage = textLabels
       .splice(repliedTo + 1) // avoid "Original message:"
@@ -86,7 +99,8 @@ export function getMessageContent(node: Node): Message | null {
       originalMessage,
     };
   } else {
-    if (textLabels.length === 0) return null;
+    if (textLabels.length === 0)
+      return [null, MessageParseStatus.UNKNOWN_FORMAT];
     senderName = textLabels[textLabels.length - 1].text;
     senderName = senderName === "You sent" ? "You" : senderName;
     textLabels.pop();
@@ -97,13 +111,16 @@ export function getMessageContent(node: Node): Message | null {
     time = textLabels[textLabels.length - 1].text;
   }
 
-  return {
-    time,
-    replyInfo,
-    senderName,
-    body: messageBody,
-    isImage: false,
-  };
+  return [
+    {
+      time,
+      replyInfo,
+      senderName,
+      body: messageBody,
+      isImage: false,
+    },
+    MessageParseStatus.SUCCESS,
+  ];
 }
 
 function getMessageTextIncompleteLabels(node: Node): TextLabel[] {
@@ -140,4 +157,8 @@ function getMessageTextIncompleteLabels(node: Node): TextLabel[] {
     return Array.from(node.childNodes).flatMap(getMessageTextIncompleteLabels);
   }
   return [];
+}
+
+function isMessageDiv(elt: Element): boolean {
+  return elt instanceof HTMLDivElement && elt.getAttribute("role") === null;
 }

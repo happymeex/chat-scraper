@@ -1,53 +1,52 @@
 import { getScrollableAndMessageContainer } from "./scraper";
-import { scrollUp, writeToNewWindow, pollingProcess } from "./utils";
-import { getMessageContent, Message } from "./messageParser";
+import { scrollUp, writeToNewWindow } from "./utils";
+import {
+  getMessageContent,
+  Message,
+  MessageParseStatus,
+} from "./messageParser";
 
-const POLLING_TIME = 5000;
+const POLLING_TIME = 1000;
 
 function main() {
   const { scrollContainer, messageDiv } = getScrollableAndMessageContainer();
-  console.log(scrollContainer);
   scrollUp(scrollContainer);
-  console.log(messageDiv);
   let activeMessageDivs = Array.from(messageDiv.children);
   const processedMessages: (Message | null)[] = [];
-  const processMessages = () => {
-    const tempProcessedMessages: (Message | null)[] = [];
-    const messages = activeMessageDivs.map(getMessageContent);
-    let earliestValidMessageIndex = messages.length;
-    for (let i = messages.length - 1; i >= 0; i--) {
-      const message = messages[i];
-      if (messages[i]) {
-        earliestValidMessageIndex = i;
-      }
-      tempProcessedMessages.unshift(message);
+
+  let currentDivToProcess = messageDiv.lastElementChild;
+  // Returns true if should terminate, otherwise false
+  const processLastMessage = () => {
+    console.log("processing message");
+    if (currentDivToProcess === null) {
+      console.log("null now");
+      return true;
     }
-    processedMessages.push(
-      ...tempProcessedMessages.slice(earliestValidMessageIndex).reverse()
-    );
-    activeMessageDivs.slice(earliestValidMessageIndex).forEach((div) => {
-      div.remove();
-    });
+    const [message, status] = getMessageContent(currentDivToProcess);
+    if (status === MessageParseStatus.NOT_A_MESSAGE) {
+      console.log("Not a message");
+      return true;
+    }
+    if (status === MessageParseStatus.EMPTY_MESSAGE) {
+      // out of view
+      currentDivToProcess.scrollIntoView();
+      console.log("wait! empty message");
+      return false;
+    } else {
+      console.log("Processed message: ", message);
+      processedMessages.push(message);
+      currentDivToProcess = currentDivToProcess.previousElementSibling;
+      return false;
+    }
   };
 
-  processMessages();
-  const hydrateActiveMessages = () => {
-    activeMessageDivs = Array.from(messageDiv.children);
-  };
-
-  pollingProcess(
-    () => {
-      processMessages();
-      hydrateActiveMessages();
-    },
-    () => activeMessageDivs.length === 0,
-    () => {
-      const output = JSON.stringify(processedMessages, null, 2);
-      writeToNewWindow(output);
-      console.log(output);
-    },
-    POLLING_TIME
-  );
+  const process = setInterval(() => {
+    if (processLastMessage()) {
+      clearInterval(process);
+      writeToNewWindow(JSON.stringify(processedMessages));
+      console.log("Done!");
+    }
+  }, POLLING_TIME);
 }
 
 main();
