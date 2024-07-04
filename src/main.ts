@@ -72,7 +72,7 @@ function scrapeFactory() {
     };
 
     const process = setInterval(() => {
-      if (processLastMessage() || window.innerWidth < 768) {
+      if (processLastMessage()) {
         console.log(processedMessages);
         writeJSONToNewWindow(processedMessages);
         console.log("Done!");
