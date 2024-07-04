@@ -27,23 +27,21 @@ function findScrollableMessageContainer(
   });
 }
 
-export function getScrollableAndMessageContainer(): {
-  /** Scrollable div that contains all the messages */
-  scrollContainer: HTMLElement;
-  /** Direct parent of all the messages */
-  messageDiv: HTMLElement;
-} {
+/**
+ * @returns The div that contains all the messages, or null if not found
+ */
+export function getScrollableAndMessageContainer(): HTMLElement | null {
   const outerContainer = findMessageDiv();
   if (!outerContainer) {
-    throw new Error("Could not find message container");
+    return null;
   }
   const scrollContainer = findScrollableMessageContainer(outerContainer);
   if (!scrollContainer) {
-    throw new Error("Could not find scrollable message container");
+    return null;
   }
   const messageDiv = scrollContainer.firstElementChild;
   if (!(messageDiv instanceof HTMLElement)) {
-    throw new Error("Could not find message div");
+    return null;
   }
-  return { scrollContainer, messageDiv };
+  return messageDiv;
 }

@@ -17,13 +17,17 @@ function main() {
 }
 
 function scrapeFactory() {
-  const { scrollContainer, messageDiv } = getScrollableAndMessageContainer();
   const processedMessages: (Message | null)[] = [];
-  const processedDivs = new Set<Element>();
-  let currentDivToProcess = messageDiv.lastElementChild;
 
   let scrapeProcess: number | null = null;
   const startScrape = () => {
+    const messageDiv = getScrollableAndMessageContainer();
+    const processedDivs = new Set<Element>();
+    if (!messageDiv) {
+      console.log("Chat not found!");
+      return;
+    }
+    let currentDivToProcess = messageDiv.lastElementChild;
     console.log("Scraping...");
     // Returns true if should terminate, otherwise false
     const tryMovingToPreviousSiblingMessageDiv = () => {
