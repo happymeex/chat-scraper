@@ -48,6 +48,13 @@ export function getMessageContent(
 ): [Message | null, MessageParseStatus] {
   if (!isMessageDiv(elt)) return [null, MessageParseStatus.NOT_A_MESSAGE];
   const textLabels = getMessageTextIncompleteLabels(elt);
+  const copy = textLabels.map((label) => label.text);
+
+  let time: string | null = null;
+  while (textLabels.length > 0 && textLabels[0].type === TextType.TIME) {
+    time = textLabels[0].text;
+    textLabels.shift();
+  }
 
   if (textLabels.length === 0) return [null, MessageParseStatus.EMPTY_MESSAGE];
 
@@ -57,7 +64,7 @@ export function getMessageContent(
       return [null, MessageParseStatus.TERMINATE];
     return [
       {
-        time: null,
+        time,
         replyInfo: null,
         senderName: text === "You sent" ? "You" : text,
         body: "",
@@ -109,11 +116,6 @@ export function getMessageContent(
     textLabels.pop();
   }
 
-  let time = null;
-  if (textLabels.length !== 0) {
-    time = textLabels[textLabels.length - 1].text;
-  }
-
   return [
     {
       time,
@@ -145,6 +147,8 @@ function getMessageTextIncompleteLabels(node: Node): TextLabel[] {
         parentElt instanceof HTMLSpanElement
       ) {
         textType = TextType.SENT_MARKER;
+      } else if (parentElt.closest("h3[dir='auto']")) {
+        textType = TextType.TIME;
       }
     }
 
