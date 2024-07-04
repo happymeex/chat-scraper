@@ -54,12 +54,12 @@ export function getMessageContent(node: Node): Message | null {
   const messageBody = textLabels[textLabels.length - 1].text;
   textLabels.pop();
 
-  // check if it's a reply
+  let senderName: string | null = null;
+  let replyInfo: ReplyInfo | null = null;
+  // check if it's a reply by getting index of "Original message:"
   const repliedTo = textLabels.findIndex(
     (label) => label.type === TextType.REPLY_INFO
   );
-  let senderName: string | null = null;
-  let replyInfo: ReplyInfo | null = null;
   if (repliedTo === 0) return null; // reply missing sender/addressee info
   if (repliedTo > 0) {
     let addresseeName: string | null = null;
@@ -74,9 +74,12 @@ export function getMessageContent(node: Node): Message | null {
       return null;
     }
     const originalMessage = textLabels
-      .splice(repliedTo + 1)
+      .splice(repliedTo + 1) // avoid "Original message:"
       .map((label) => label.text)
       .join("");
+
+    textLabels.pop(); // remove "Original message:"
+    textLabels.pop(); // remove "X replied to Y"
 
     replyInfo = {
       addresseeName,
