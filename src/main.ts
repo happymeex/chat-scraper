@@ -1,5 +1,5 @@
 import { getScrollableAndMessageContainer } from "./scraper";
-import { scrollUp, writeToNewWindow } from "./utils";
+import { writeToNewWindow } from "./utils";
 import {
   getMessageContent,
   isMessageDiv,
@@ -12,7 +12,6 @@ const POLLING_TIME = 600;
 
 function main() {
   const { scrollContainer, messageDiv } = getScrollableAndMessageContainer();
-  scrollUp(scrollContainer);
   const processedMessages: (Message | null)[] = [];
   const processedDivs = new Set<Element>();
   let currentDivToProcess = messageDiv.lastElementChild;

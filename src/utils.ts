@@ -1,11 +1,4 @@
 /**
- * Scrolls the given view of the given container to the top.
- */
-export function scrollUp(scrollContainer: HTMLElement) {
-  scrollContainer.scrollTop = 0;
-}
-
-/**
  * Finds the first HTML descendant of the given element that matches the given validator.
  *
  * @param domElement the element
