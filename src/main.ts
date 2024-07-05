@@ -94,6 +94,7 @@ function scrapeFactory(handleStopScrapeUI: () => void = () => {}): {
         console.log("Done!");
         clearInterval(process);
         handleStopScrapeUI();
+        processedMessages = [];
       }
     }, POLLING_TIME);
     scrapeProcess = process;
