@@ -26,7 +26,7 @@ class ScraperPanelUI implements ScraperPanel {
     this.panel.innerHTML = `<h1>Chat Scraper</h1>`;
     this.panel.appendChild(this.scrapeButton);
     this.panel.classList.add("chat-scraper-panel");
-    this.panel.onclick = () => {
+    this.scrapeButton.onclick = () => {
       if (this.state === "idle") {
         this.setScraping();
         this.onStartScrape();
