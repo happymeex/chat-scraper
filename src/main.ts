@@ -18,7 +18,7 @@ import {
   getRawStringFromMessageJSON,
 } from "./format";
 
-const POLLING_TIME = 400;
+const POLLING_TIME = 50;
 
 function main() {
   const panel = makeScraperPanel();
