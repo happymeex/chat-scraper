@@ -13,6 +13,9 @@ const POLLING_TIME = 400;
 
 function main() {
   const panel = makeScraperPanel();
+  if (!panel) {
+    return;
+  }
   const { startScrape, stopScrape } = scrapeFactory(() => panel.setIdle());
   panel.setStartScrapeHandler(startScrape);
   panel.setStopScrapeHandler(stopScrape);

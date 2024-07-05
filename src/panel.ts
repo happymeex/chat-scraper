@@ -6,7 +6,17 @@ export interface ScraperPanel {
   display: () => void;
 }
 
-export function makeScraperPanel(): ScraperPanel {
+/**
+ * Creates a ScraperPanel if one does not already exist.
+ *
+ * @return The created ScraperPanel or null if it already exists.
+ */
+export function makeScraperPanel(): ScraperPanel | null {
+  const maybePanel = document.querySelector(".chat-scraper-panel");
+  if (maybePanel) {
+    maybePanel.remove();
+    return null;
+  }
   return new ScraperPanelUI();
 }
 
@@ -60,6 +70,11 @@ class ScraperPanelUI implements ScraperPanel {
     style.innerText = panelCSS;
     document.body.prepend(style);
     document.body.prepend(this.panel);
+  }
+
+  public remove() {
+    this.onStopScrape();
+    this.panel.remove();
   }
 
   public setStartScrapeHandler(handler: () => void) {
