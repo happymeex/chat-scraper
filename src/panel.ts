@@ -172,9 +172,9 @@ class ScraperPanelUI implements ScraperPanel {
 }
 
 const borderWhite = "#848484";
-const darkGray = "#222222";
-const medGray = "#2f2f2f";
-const lightGray = "#4c4c4c";
+const darkGray = "#292929";
+const medGray = "#3c3c3c";
+const lightGray = "#595959";
 const offWhite = "#dfdfdf";
 const primary = "#4d9648";
 const secondary = "#994252";
@@ -190,6 +190,7 @@ const panelCSS = `
     padding: 10px 20px 16px;
     font-size: 16px;
     max-width: 300px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
 }
 .chat-scraper-panel * {
     color: ${offWhite};
@@ -207,7 +208,7 @@ const panelCSS = `
     align-items: center;
     margin-top: 10px;
 }
-.scrape-button {
+.chat-scraper-panel .scrape-button {
     margin-top: 10px;
     background-color: ${primary};
     font-weight: bold;
@@ -217,6 +218,11 @@ const panelCSS = `
     color: white;
     width: 100%;
     font-size: 1rem;
+}
+.chat-scraper-panel .scrape-button:hover {
+    transition: filter 0.15s ease-in-out;
+    cursor: pointer;
+    filter: brightness(1.1);
 }
 .chat-scraper-panel .options-holder {
     display: none;
@@ -232,7 +238,7 @@ const panelCSS = `
 }
 .chat-scraper-panel .regular-button {
     margin-top: 10px;
-    background-color: ${darkGray};
+    background-color: ${lightGray};
     font-weight: bold;
     border-radius: 2px;
     border: 1px solid ${borderWhite};
@@ -244,18 +250,10 @@ const panelCSS = `
 .chat-scraper-panel .regular-button:hover {
     transition: filter 0.15s ease-in-out;
     cursor: pointer;
-    filter: brightness(1.2);
-}
-.scrape-button:hover {
-    transition: background-color 0.15s ease-in-out;
-    cursor: pointer;
-    background-color: ${primary}dd;
+    filter: brightness(1.1);
 }
 .chat-scraper-panel.scraping .scrape-button {
     background-color: ${secondary};
-}
-.chat-scraper-panel.scraping .scrape-button:hover {
-    background-color: ${secondary}cc;
 }
 .chat-scraper-panel .radio-holder {
     margin-top: 12px;
