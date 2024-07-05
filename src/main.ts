@@ -1,5 +1,9 @@
 import { getChatNameAndMessageDiv } from "./scraper";
-import { downloadJSONFile, writeJSONToNewWindow } from "./utils";
+import {
+  downloadJSONFile,
+  openHTMLInNewWindow,
+  writeJSONToNewWindow,
+} from "./utils";
 import {
   getMessageContent,
   isMessageDiv,
@@ -8,6 +12,7 @@ import {
   isProfileBanner,
 } from "./messageParser";
 import { makeScraperPanel } from "./panel";
+import { getHTMLStringFromMessageJSON } from "./format";
 
 const POLLING_TIME = 400;
 
@@ -152,6 +157,7 @@ function scrapeFactory({
     if (scrapeProcess) {
       writeJSONToNewWindow(processedMessages);
       const messages = processedMessages;
+      const chatNameString = chatName ?? "";
       console.log("Stopped scraping!");
       clearInterval(scrapeProcess);
       handleStopScrapeUI(
@@ -167,7 +173,14 @@ function scrapeFactory({
           console.log("Number of messages: ", messages.length);
           if (format === "json") {
             writeJSONToNewWindow(messages);
-          } else return;
+          } else if (format === "text") {
+            const nonNullMessages = messages.filter(
+              (message) => message !== null
+            ) as Message[];
+            openHTMLInNewWindow(
+              getHTMLStringFromMessageJSON(chatNameString, nonNullMessages)
+            );
+          }
         }
       );
       scrapeProcess = null;

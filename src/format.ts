@@ -1,0 +1,58 @@
+import { Message } from "./messageParser";
+
+export function getHTMLStringFromMessageJSON(
+  chatName: string,
+  messages: Message[]
+): string {
+  const messageStrings = messages.map(getElementStringFromMessage);
+  return `<html>
+  <head>
+    <style>${CSS}</style>
+  </head>
+  <body>
+  <header>
+    <h1>${chatName}</h1>
+  </header>
+    <main class="message-container">${messageStrings.join("")}</main>
+  </body>
+  </html>`;
+}
+
+function getElementStringFromMessage(message: Message): string {
+  const name = `<strong>${message.senderName}</strong>`;
+  if (message.isImage) {
+    return `<p>${name} sent an image</p>`;
+  }
+  return `<p>${name}${formatReplyInfo(message.replyInfo)}: ${message.body}</p>`;
+}
+
+function formatReplyInfo(replyInfo: Message["replyInfo"]): string {
+  if (!replyInfo) return "";
+  return ` (replying to ${replyInfo.addresseeName}, who wrote: "${replyInfo.originalMessage}")`;
+}
+
+const CSS = `
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+body * {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+.message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 700px;
+}
+.message-container * {
+  font-size: 16px;
+}
+.message-container p {
+  text-align: justify;
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}`;
