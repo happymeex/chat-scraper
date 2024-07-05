@@ -1,4 +1,4 @@
-import { getScrollableAndMessageContainer } from "./scraper";
+import { getChatNameAndMessageDiv } from "./scraper";
 import { writeJSONToNewWindow } from "./utils";
 import {
   getMessageContent,
@@ -16,36 +16,50 @@ function main() {
   if (!panel) {
     return;
   }
-  const { startScrape, stopScrape } = scrapeFactory(() => {
-    panel.setIdle();
-    panel.showExportOptions();
-  });
+  const { startScrape, stopScrape } = scrapeFactory(
+    (chatName: string) => {
+      panel.setCurrentChatName(chatName);
+    },
+    () => {
+      panel.setIdle();
+      panel.showExportOptions();
+    }
+  );
   panel.setStartScrapeHandler(startScrape);
   panel.setStopScrapeHandler(stopScrape);
   panel.display();
 }
 
 /**
- * @param handleStopScrapeUI function to be called when the system (rather than the user)
- * decides to stop the scrape, in order to sync the UI
+ * @param handleStartScrapeUI function to be called when the system
+ * initiates the scrape, in order to sync the UI
+ * @param handleStopScrapeUI function to be called when the system
+ * terminates the scrape, in order to sync the UI
  * @returns
  */
-function scrapeFactory(handleStopScrapeUI: () => void = () => {}): {
+function scrapeFactory(
+  handleStartScrapeUI: (chatName: string) => void = () => {},
+  handleStopScrapeUI: () => void = () => {}
+): {
   /** Function to start the scrape when the user initiates it. */
   startScrape: () => void;
   /** Function to stop the scrape when the user terminates it. */
   stopScrape: () => void;
 } {
+  let chatName: string | null = null;
   let processedMessages: (Message | null)[] = [];
 
   let scrapeProcess: number | null = null;
   const startScrape = () => {
-    const messageDiv = getScrollableAndMessageContainer();
-    const processedDivs = new Set<Element>();
-    if (!messageDiv) {
+    const chatNameAndMessageDiv = getChatNameAndMessageDiv();
+    if (!chatNameAndMessageDiv) {
       console.log("Chat not found!");
       return;
     }
+    const { chatName: name, messageDiv } = chatNameAndMessageDiv;
+    chatName = name;
+    handleStartScrapeUI(chatName);
+    const processedDivs = new Set<Element>();
     let currentDivToProcess = messageDiv.lastElementChild;
     console.log("Scraping...");
     // Returns true if should terminate, otherwise false
@@ -101,6 +115,7 @@ function scrapeFactory(handleStopScrapeUI: () => void = () => {}): {
         clearInterval(process);
         handleStopScrapeUI();
         processedMessages = [];
+        chatName = null;
       }
     }, POLLING_TIME);
     scrapeProcess = process;
@@ -111,8 +126,10 @@ function scrapeFactory(handleStopScrapeUI: () => void = () => {}): {
       writeJSONToNewWindow(processedMessages);
       console.log("Stopped scraping!");
       clearInterval(scrapeProcess);
+      handleStopScrapeUI();
       scrapeProcess = null;
       processedMessages = [];
+      chatName = null;
     }
   };
 

@@ -6,6 +6,7 @@ export interface ScraperPanel {
   setOnDownloadHandler: (handler: () => void) => void;
   setOnOpenInNewWindowHandler: (handler: () => void) => void;
   showExportOptions: () => void;
+  setCurrentChatName: (chatName: string) => void;
   display: () => void;
 }
 
@@ -34,6 +35,7 @@ class ScraperPanelUI implements ScraperPanel {
   private readonly openInNewWindowButton: HTMLButtonElement;
   private readonly exportOptionsHolder: HTMLDivElement;
   private state: "idle" | "scraping" = "idle";
+  private currentChatName: string | null = null;
 
   public constructor() {
     this.panel = document.createElement("div");
@@ -61,6 +63,8 @@ class ScraperPanelUI implements ScraperPanel {
 
     this.exportOptionsHolder = document.createElement("div");
     this.exportOptionsHolder.classList.add("options-holder");
+    this.exportOptionsHolder.innerHTML =
+      '<div class="last-scraped-banner"></div>';
     this.panel.appendChild(this.exportOptionsHolder);
 
     this.downloadButton = document.createElement("button");
@@ -122,7 +126,14 @@ class ScraperPanelUI implements ScraperPanel {
   }
 
   public showExportOptions() {
+    this.exportOptionsHolder.querySelector(
+      ".last-scraped-banner"
+    )!.innerHTML = `Last scraped: ${this.currentChatName}`;
     this.exportOptionsHolder.classList.add("visible");
+  }
+
+  public setCurrentChatName(chatName: string) {
+    this.currentChatName = chatName;
   }
 }
 

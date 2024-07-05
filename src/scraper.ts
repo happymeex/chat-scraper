@@ -30,11 +30,28 @@ function findScrollableMessageContainer(
 /**
  * @returns The div that contains all the messages, or null if not found
  */
-export function getScrollableAndMessageContainer(): HTMLElement | null {
+export function getChatNameAndMessageDiv(): {
+  chatName: string;
+  messageDiv: HTMLElement;
+} | null {
+  let chatName: string;
   const outerContainer = findMessageDiv();
   if (!outerContainer) {
     return null;
   }
+  const ariaLabel = outerContainer.getAttribute("aria-label");
+  if (!ariaLabel) {
+    return null;
+  }
+  const match = ariaLabel.match(
+    /Messages in conversation (?:with|titled) (.*)/
+  );
+  if (!match) {
+    return null;
+  }
+  chatName = match[1];
+
+  chatName = match[1];
   const scrollContainer = findScrollableMessageContainer(outerContainer);
   if (!scrollContainer) {
     return null;
@@ -43,5 +60,5 @@ export function getScrollableAndMessageContainer(): HTMLElement | null {
   if (!(messageDiv instanceof HTMLElement)) {
     return null;
   }
-  return messageDiv;
+  return { chatName, messageDiv };
 }
