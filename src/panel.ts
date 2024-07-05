@@ -75,6 +75,7 @@ const borderWhite = "#848484";
 const darkGray = "#222222";
 const offWhite = "#dfdfdf";
 const primary = "#4d9648";
+const secondary = "#994252";
 const panelCSS = `
 .chat-scraper-panel {
     position: absolute;
@@ -109,6 +110,12 @@ const panelCSS = `
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
     background-color: ${primary}cc;
+}
+.chat-scraper-panel.scraping .scrape-button {
+    background-color: ${secondary};
+}
+.chat-scraper-panel.scraping .scrape-button:hover {
+    background-color: ${secondary}cc;
 }
 .chat-scraper-panel .loading-spinner {
   display: none;
