@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "npm run bundle && node scripts/clipboard.mjs",
+    "build": "npm run bundle && node scripts/bookmarklet.mjs",
     "bundle": "esbuild src/main.ts --bundle --minify --outfile=dist/main.js"
   },
   "keywords": [],
