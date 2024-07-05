@@ -1,5 +1,7 @@
 import { addRadioInput } from "./utils";
 
+const CSP = "chat-scraper-panel";
+
 export interface ScraperPanel {
   setIdle: () => void;
   setScraping: () => void;
@@ -20,10 +22,10 @@ export interface ScraperPanel {
  * @return The created ScraperPanel or null if it already exists.
  */
 export function makeScraperPanel(): ScraperPanel | null {
-  const maybePanel = document.querySelector(".chat-scraper-panel");
+  const maybePanel = document.querySelector(`.${CSP}`);
   if (maybePanel) {
     maybePanel.remove();
-    document.querySelector(".chat-scraper-style")?.remove();
+    document.querySelector(`.${CSP}`)?.remove();
     return null;
   }
   return new ScraperPanelUI();
@@ -52,7 +54,7 @@ class ScraperPanelUI implements ScraperPanel {
     this.scrapeButton.classList.add("scrape-button");
     this.panel.innerHTML = `<h1>Chat Scraper</h1>`;
     this.panel.appendChild(this.scrapeButton);
-    this.panel.classList.add("chat-scraper-panel");
+    this.panel.classList.add(CSP);
     this.scrapeButton.onclick = () => {
       if (this.state === "idle") {
         this.setScraping();
@@ -179,7 +181,7 @@ const offWhite = "#dfdfdf";
 const primary = "#4d9648";
 const secondary = "#994252";
 const panelCSS = `
-.chat-scraper-panel {
+.${CSP} {
     position: absolute;
     z-index: 10000;
     top: 10px;
@@ -192,23 +194,23 @@ const panelCSS = `
     max-width: 300px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
 }
-.chat-scraper-panel * {
+.${CSP} * {
     color: ${offWhite};
 }
-.chat-scraper-panel h1 {
+.${CSP} h1 {
     font-size: 1.5rem;
     font-weight: bold;
 }
-.status-banner {
+.${CSP} .status-banner {
     display: none;
 }
-.chat-scraper-panel.scraping .status-banner {
+.${CSP}.scraping .status-banner {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 10px;
 }
-.chat-scraper-panel .scrape-button {
+.${CSP} .scrape-button {
     margin-top: 10px;
     background-color: ${primary};
     font-weight: bold;
@@ -219,24 +221,24 @@ const panelCSS = `
     width: 100%;
     font-size: 1rem;
 }
-.chat-scraper-panel .scrape-button:hover {
+.${CSP} .scrape-button:hover {
     transition: filter 0.15s ease-in-out;
     cursor: pointer;
     filter: brightness(1.1);
 }
-.chat-scraper-panel .options-holder {
+.${CSP} .options-holder {
     display: none;
 }
-.chat-scraper-panel .options-holder.visible {
+.${CSP} .options-holder.visible {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 8px;
 }
-.chat-scraper-panel .last-scraped-banner {
+.${CSP} .last-scraped-banner {
     margin-top: 8px;
 }
-.chat-scraper-panel .regular-button {
+.${CSP} .regular-button {
     margin-top: 10px;
     background-color: ${lightGray};
     font-weight: bold;
@@ -247,35 +249,35 @@ const panelCSS = `
     width: 100%;
     font-size: 1rem;
 }
-.chat-scraper-panel .regular-button:hover {
+.${CSP} .regular-button:hover {
     transition: filter 0.15s ease-in-out;
     cursor: pointer;
     filter: brightness(1.1);
 }
-.chat-scraper-panel.scraping .scrape-button {
+.${CSP}.scraping .scrape-button {
     background-color: ${secondary};
 }
-.chat-scraper-panel .radio-holder {
+.${CSP} .radio-holder {
     margin-top: 12px;
     display: flex;
     gap: 8px;
 }
-.chat-scraper-panel .radio-holder label {
+.${CSP} .radio-holder label {
     font-size: 1rem;
 }
-.chat-scraper-panel .radio-holder input[type="radio"]:checked {
+.${CSP} .radio-holder input[type="radio"]:checked {
     background-color: ${primary};
 }
-.chat-scraper-panel .loader {
+.${CSP} .loader {
     display: block;
     border: 4px solid ${lightGray};
     border-top: 4px solid ${medGray};
     border-radius: 50%;
     width: 20px;
     height: 20px;
-    animation: chat-scraper-panel-spin 2s linear infinite;
+    animation: ${CSP}-spin 2s linear infinite;
 }
-@keyframes chat-scraper-panel-spin {
+@keyframes ${CSP}-spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
