@@ -56,3 +56,19 @@ body * {
   hyphens: auto;
   overflow-wrap: anywhere;
 }`;
+
+export function getRawStringFromMessageJSON(
+  chatName: string,
+  messages: Message[]
+): string {
+  const lines: string[] = [];
+  lines.push("Chat: " + chatName);
+  lines.push("------------");
+  for (const message of messages) {
+    const line = `${message.senderName}${formatReplyInfo(message.replyInfo)}: ${
+      message.body
+    }`;
+    lines.push(line);
+  }
+  return lines.join("\r\n");
+}

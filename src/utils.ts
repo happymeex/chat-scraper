@@ -26,22 +26,21 @@ export function writeJSONToNewWindow(jsonObject: any) {
   const url = URL.createObjectURL(jsonBlob);
   window.open(url, "_blank");
 
-  // revoke the object URL after a delay to release memory
   setTimeout(() => {
     URL.revokeObjectURL(url);
-  }, 1000);
+  }, 5000);
 }
 
-export function downloadJSONFile(jsonObject: any) {
+export function downloadJSONFile(rawFilename: string, jsonObject: any) {
+  const fileName = sanitizeFilename(rawFilename) + ".json";
   const jsonString = JSON.stringify(jsonObject, null, 2);
   const jsonBlob = new Blob([jsonString], { type: "application/json" });
   const downloadLink = document.createElement("a");
   const url = URL.createObjectURL(jsonBlob);
   downloadLink.href = url;
-  downloadLink.download = "chat-scraper-output.json";
+  downloadLink.download = fileName;
   downloadLink.click();
 
-  // revoke the object URL after a delay to release memory
   setTimeout(() => {
     URL.revokeObjectURL(url);
   }, 5000);
@@ -51,6 +50,20 @@ export function openHTMLInNewWindow(html: string) {
   const blob = new Blob([html], { type: "text/html" });
   const url = URL.createObjectURL(blob);
   window.open(url, "_blank");
+}
+
+export function downloadTextAsFile(rawFilename: string, text: string) {
+  const fileName = sanitizeFilename(rawFilename) + ".txt";
+  const blob = new Blob([text], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+  const downloadLink = document.createElement("a");
+  downloadLink.href = url;
+  downloadLink.download = fileName;
+  downloadLink.click();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 5000);
 }
 
 export function addRadioInput(
@@ -74,4 +87,12 @@ export function addRadioInput(
   labelElement.appendChild(input);
   labelElement.append(label);
   holder.appendChild(labelElement);
+}
+
+export function sanitizeFilename(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\-_.]/g, "-")
+    .replace(/\-+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }

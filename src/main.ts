@@ -1,6 +1,7 @@
 import { getChatNameAndMessageDiv } from "./scraper";
 import {
   downloadJSONFile,
+  downloadTextAsFile,
   openHTMLInNewWindow,
   writeJSONToNewWindow,
 } from "./utils";
@@ -12,7 +13,10 @@ import {
   isProfileBanner,
 } from "./messageParser";
 import { makeScraperPanel } from "./panel";
-import { getHTMLStringFromMessageJSON } from "./format";
+import {
+  getHTMLStringFromMessageJSON,
+  getRawStringFromMessageJSON,
+} from "./format";
 
 const POLLING_TIME = 400;
 
@@ -37,19 +41,24 @@ function main() {
   panel.display();
 }
 
-interface ScrapeFactoryParams {
+type Exporter = (format: "json" | "text") => void;
+type ScrapeFactoryParams = {
   /**
-   * function to trigger UI changes when the system starts the scrape
+   * Function to trigger UI changes when the system starts the scrape
    */
   handleStartScrapeUI: (chatName: string) => void;
   /**
-   * function to trigger UI changes when the system finishes scraping
+   * Function to trigger UI changes when the system finishes scraping
    */
-  handleStopScrapeUI: (
-    downloader: (format: "json" | "text") => void,
-    windowOpener: (format: "json" | "text") => void
-  ) => void;
-}
+  handleStopScrapeUI: (downloader: Exporter, windowOpener: Exporter) => void;
+};
+
+type ScrapeFactoryOutput = {
+  /** Function to trigger system to scrape when the user initiates it. */
+  startScrape: () => void;
+  /** Function to trigger system to terminate scrape when the user stops it. */
+  stopScrape: () => void;
+};
 
 /**
  * @param handleStartScrapeUI
@@ -59,12 +68,7 @@ interface ScrapeFactoryParams {
 function scrapeFactory({
   handleStartScrapeUI,
   handleStopScrapeUI,
-}: ScrapeFactoryParams): {
-  /** Function to trigger system to scrape when the user initiates it. */
-  startScrape: () => void;
-  /** Function to trigger system to terminate scrape when the user stops it. */
-  stopScrape: () => void;
-} {
+}: ScrapeFactoryParams): ScrapeFactoryOutput {
   let chatName: string | null = null;
   let processedMessages: (Message | null)[] = [];
 
@@ -129,23 +133,10 @@ function scrapeFactory({
 
     const process = setInterval(() => {
       if (processLastMessage()) {
-        writeJSONToNewWindow(processedMessages);
-        console.log("Done!");
+        const messages = processedMessages.reverse();
+        const chatNameString = chatName ?? "";
         clearInterval(process);
-        handleStopScrapeUI(
-          (format) => {
-            console.log("Downloading format", format);
-            if (format === "json") {
-              downloadJSONFile(processedMessages);
-            } else return;
-          },
-          (format) => {
-            console.log("Opening window format", format);
-            if (format === "json") {
-              writeJSONToNewWindow(processedMessages);
-            } else return;
-          }
-        );
+        handleStopScrapeUI(...exporterFactory(chatNameString, messages));
         processedMessages = [];
         chatName = null;
       }
@@ -155,34 +146,11 @@ function scrapeFactory({
 
   const stopScrape = () => {
     if (scrapeProcess) {
-      writeJSONToNewWindow(processedMessages);
-      const messages = processedMessages;
+      const messages = processedMessages.reverse();
       const chatNameString = chatName ?? "";
       console.log("Stopped scraping!");
       clearInterval(scrapeProcess);
-      handleStopScrapeUI(
-        (format) => {
-          console.log("Downloading format", format);
-          console.log("Number of messages: ", messages.length);
-          if (format === "json") {
-            downloadJSONFile(messages);
-          } else return;
-        },
-        (format) => {
-          console.log("Opening window format", format);
-          console.log("Number of messages: ", messages.length);
-          if (format === "json") {
-            writeJSONToNewWindow(messages);
-          } else if (format === "text") {
-            const nonNullMessages = messages.filter(
-              (message) => message !== null
-            ) as Message[];
-            openHTMLInNewWindow(
-              getHTMLStringFromMessageJSON(chatNameString, nonNullMessages)
-            );
-          }
-        }
-      );
+      handleStopScrapeUI(...exporterFactory(chatNameString, messages));
       scrapeProcess = null;
       processedMessages = [];
       chatName = null;
@@ -190,6 +158,35 @@ function scrapeFactory({
   };
 
   return { startScrape, stopScrape };
+}
+
+function exporterFactory(
+  chatName: string,
+  messages: (Message | null)[]
+): [Exporter, Exporter] {
+  const nonNullMessages = messages.filter(
+    (message) => message !== null
+  ) as Message[];
+  const downloader: Exporter = (format) => {
+    if (format === "json") {
+      downloadJSONFile(chatName, messages);
+    } else if (format === "text") {
+      downloadTextAsFile(
+        chatName,
+        getRawStringFromMessageJSON(chatName, nonNullMessages)
+      );
+    }
+  };
+  const windowOpener: Exporter = (format) => {
+    if (format === "json") {
+      writeJSONToNewWindow(messages);
+    } else if (format === "text") {
+      openHTMLInNewWindow(
+        getHTMLStringFromMessageJSON(chatName, nonNullMessages)
+      );
+    }
+  };
+  return [downloader, windowOpener];
 }
 
 main();
