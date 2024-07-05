@@ -99,6 +99,7 @@ class ScraperPanelUI implements ScraperPanel {
 
   public display() {
     const style = document.createElement("style");
+    style.classList.add("chat-scraper-style");
     style.innerText = panelCSS;
     document.body.prepend(style);
     document.body.prepend(this.panel);
@@ -107,6 +108,7 @@ class ScraperPanelUI implements ScraperPanel {
   public remove() {
     this.onStopScrape();
     this.panel.remove();
+    document.querySelector(".chat-scraper-style")?.remove();
   }
 
   public setStartScrapeHandler(handler: () => void) {
@@ -128,7 +130,7 @@ class ScraperPanelUI implements ScraperPanel {
   public showExportOptions() {
     this.exportOptionsHolder.querySelector(
       ".last-scraped-banner"
-    )!.innerHTML = `Last scraped: ${this.currentChatName}`;
+    )!.innerHTML = `<strong style="font-weight: bold">Last scraped:</strong> ${this.currentChatName}`;
     this.exportOptionsHolder.classList.add("visible");
   }
 
@@ -139,6 +141,8 @@ class ScraperPanelUI implements ScraperPanel {
 
 const borderWhite = "#848484";
 const darkGray = "#222222";
+const medGray = "#2f2f2f";
+const lightGray = "#4c4c4c";
 const offWhite = "#dfdfdf";
 const primary = "#4d9648";
 const secondary = "#994252";
@@ -151,8 +155,9 @@ const panelCSS = `
     border-radius: 4px;
     border: 1px solid ${borderWhite};
     background-color: ${darkGray};
-    padding: 10px 20px 20px;
+    padding: 10px 20px 16px;
     font-size: 16px;
+    max-width: 300px;
 }
 .chat-scraper-panel * {
     color: ${offWhite};
@@ -185,6 +190,10 @@ const panelCSS = `
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 8px;
+}
+.chat-scraper-panel .last-scraped-banner {
+    
 }
 .chat-scraper-panel .regular-button {
     margin-top: 10px;
@@ -218,8 +227,8 @@ const panelCSS = `
 }
 .chat-scraper-panel.scraping .loader {
     display: block;
-    border: 6px solid #f3f3f3;
-    border-top: 6px solid #3498db;
+    border: 4px solid ${lightGray};
+    border-top: 4px solid ${medGray};
     border-radius: 50%;
     width: 20px;
     height: 20px;
