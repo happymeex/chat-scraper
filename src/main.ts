@@ -7,13 +7,16 @@ import {
   MessageParseStatus,
   isProfileBanner,
 } from "./messageParser";
-import { makeUIPanel } from "./ui";
+import { makeScraperPanel } from "./panel";
 
 const POLLING_TIME = 400;
 
 function main() {
   const { startScrape, stopScrape } = scrapeFactory();
-  makeUIPanel(startScrape, stopScrape);
+  const panel = makeScraperPanel();
+  panel.setStartScrapeHandler(startScrape);
+  panel.setStopScrapeHandler(stopScrape);
+  panel.display();
 }
 
 function scrapeFactory() {
