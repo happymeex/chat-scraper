@@ -3,6 +3,9 @@ export interface ScraperPanel {
   setScraping: () => void;
   setStartScrapeHandler: (handler: () => void) => void;
   setStopScrapeHandler: (handler: () => void) => void;
+  setOnDownloadHandler: (handler: () => void) => void;
+  setOnOpenInNewWindowHandler: (handler: () => void) => void;
+  showExportOptions: () => void;
   display: () => void;
 }
 
@@ -23,9 +26,13 @@ export function makeScraperPanel(): ScraperPanel | null {
 class ScraperPanelUI implements ScraperPanel {
   private onStartScrape = () => {};
   private onStopScrape = () => {};
+  private onDownload = () => {};
+  private onOpenInNewWindow = () => {};
   private readonly panel: HTMLDivElement;
   private readonly scrapeButton: HTMLButtonElement;
-  private loadingSpinner: HTMLDivElement;
+  private readonly downloadButton: HTMLButtonElement;
+  private readonly openInNewWindowButton: HTMLButtonElement;
+  private readonly exportOptionsHolder: HTMLDivElement;
   private state: "idle" | "scraping" = "idle";
 
   public constructor() {
@@ -42,19 +49,41 @@ class ScraperPanelUI implements ScraperPanel {
         this.onStartScrape();
       } else if (this.state === "scraping") {
         this.setIdle();
+        this.showExportOptions();
         this.onStopScrape();
       }
     };
-    this.loadingSpinner = document.createElement("div");
-    this.loadingSpinner.style.display = "none";
-    this.loadingSpinner.innerText = "Loading...";
-    this.panel.appendChild(this.loadingSpinner);
+
+    const statusBanner = document.createElement("div");
+    statusBanner.innerHTML = '<div class="loader"></div>';
+    statusBanner.classList.add("status-banner");
+    this.panel.appendChild(statusBanner);
+
+    this.exportOptionsHolder = document.createElement("div");
+    this.exportOptionsHolder.classList.add("options-holder");
+    this.panel.appendChild(this.exportOptionsHolder);
+
+    this.downloadButton = document.createElement("button");
+    this.downloadButton.innerText = "Download";
+    this.downloadButton.classList.add("regular-button");
+    this.exportOptionsHolder.appendChild(this.downloadButton);
+
+    this.openInNewWindowButton = document.createElement("button");
+    this.openInNewWindowButton.innerText = "Open in new window";
+    this.openInNewWindowButton.classList.add("regular-button");
+    this.exportOptionsHolder.appendChild(this.openInNewWindowButton);
+
+    this.downloadButton.onclick = () => {
+      this.onDownload();
+    };
+    this.openInNewWindowButton.onclick = () => {
+      this.onOpenInNewWindow();
+    };
   }
 
   public setIdle() {
     this.state = "idle";
     this.scrapeButton.innerText = "Start scrape";
-    this.loadingSpinner.style.display = "none";
     this.panel.classList.remove("scraping");
   }
 
@@ -62,7 +91,6 @@ class ScraperPanelUI implements ScraperPanel {
     this.state = "scraping";
     this.scrapeButton.innerText = "Stop scrape";
     this.panel.classList.add("scraping");
-    this.loadingSpinner.style.display = "";
   }
 
   public display() {
@@ -84,6 +112,18 @@ class ScraperPanelUI implements ScraperPanel {
   public setStopScrapeHandler(handler: () => void) {
     this.onStopScrape = handler;
   }
+
+  public setOnDownloadHandler(handler: () => void) {
+    this.onDownload = handler;
+  }
+
+  public setOnOpenInNewWindowHandler(handler: () => void) {
+    this.onOpenInNewWindow = handler;
+  }
+
+  public showExportOptions() {
+    this.exportOptionsHolder.classList.add("visible");
+  }
 }
 
 const borderWhite = "#848484";
@@ -100,7 +140,7 @@ const panelCSS = `
     border-radius: 4px;
     border: 1px solid ${borderWhite};
     background-color: ${darkGray};
-    padding: 10px 20px;
+    padding: 10px 20px 20px;
     font-size: 16px;
 }
 .chat-scraper-panel * {
@@ -109,6 +149,12 @@ const panelCSS = `
 .chat-scraper-panel h1 {
     font-size: 1.5rem;
     font-weight: bold;
+}
+.chat-scraper-panel .status-banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
 }
 .scrape-button {
     margin-top: 10px;
@@ -121,6 +167,30 @@ const panelCSS = `
     width: 100%;
     font-size: 1rem;
 }
+.chat-scraper-panel .options-holder {
+    display: none;
+}
+.chat-scraper-panel .options-holder.visible {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.chat-scraper-panel .regular-button {
+    margin-top: 10px;
+    background-color: ${darkGray};
+    font-weight: bold;
+    border-radius: 2px;
+    border: 1px solid ${borderWhite};
+    padding: 10px 20px;
+    color: white;
+    width: 100%;
+    font-size: 1rem;
+}
+.chat-scraper-panel .regular-button:hover {
+    transition: background-color 0.15s ease-in-out;
+    cursor: pointer;
+    filter: brightness(1.2);
+}
 .scrape-button:hover {
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
@@ -132,14 +202,21 @@ const panelCSS = `
 .chat-scraper-panel.scraping .scrape-button:hover {
     background-color: ${secondary}cc;
 }
-.chat-scraper-panel .loading-spinner {
-  display: none;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.loader {
+    display: none;
 }
-.chat-scraper-panel.scraping .loading-spinner {
-  display: block;
+.chat-scraper-panel.scraping .loader {
+    display: block;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #3498db;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: chat-scraper-panel-spin 2s linear infinite;
+}
+  
+@keyframes chat-scraper-panel-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 `;

@@ -16,7 +16,10 @@ function main() {
   if (!panel) {
     return;
   }
-  const { startScrape, stopScrape } = scrapeFactory(() => panel.setIdle());
+  const { startScrape, stopScrape } = scrapeFactory(() => {
+    panel.setIdle();
+    panel.showExportOptions();
+  });
   panel.setStartScrapeHandler(startScrape);
   panel.setStopScrapeHandler(stopScrape);
   panel.display();
