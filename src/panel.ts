@@ -19,6 +19,7 @@ export function makeScraperPanel(): ScraperPanel | null {
   const maybePanel = document.querySelector(".chat-scraper-panel");
   if (maybePanel) {
     maybePanel.remove();
+    document.querySelector(".chat-scraper-style")?.remove();
     return null;
   }
   return new ScraperPanelUI();
@@ -166,7 +167,10 @@ const panelCSS = `
     font-size: 1.5rem;
     font-weight: bold;
 }
-.chat-scraper-panel .status-banner {
+.status-banner {
+    display: none;
+}
+.chat-scraper-panel.scraping .status-banner {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -193,7 +197,7 @@ const panelCSS = `
     margin-top: 8px;
 }
 .chat-scraper-panel .last-scraped-banner {
-    
+    margin-top: 8px;
 }
 .chat-scraper-panel .regular-button {
     margin-top: 10px;
@@ -207,14 +211,14 @@ const panelCSS = `
     font-size: 1rem;
 }
 .chat-scraper-panel .regular-button:hover {
-    transition: background-color 0.15s ease-in-out;
+    transition: filter 0.15s ease-in-out;
     cursor: pointer;
     filter: brightness(1.2);
 }
 .scrape-button:hover {
     transition: background-color 0.15s ease-in-out;
     cursor: pointer;
-    background-color: ${primary}cc;
+    background-color: ${primary}dd;
 }
 .chat-scraper-panel.scraping .scrape-button {
     background-color: ${secondary};
@@ -222,10 +226,7 @@ const panelCSS = `
 .chat-scraper-panel.scraping .scrape-button:hover {
     background-color: ${secondary}cc;
 }
-.loader {
-    display: none;
-}
-.chat-scraper-panel.scraping .loader {
+.chat-scraper-panel .loader {
     display: block;
     border: 4px solid ${lightGray};
     border-top: 4px solid ${medGray};
@@ -234,7 +235,6 @@ const panelCSS = `
     height: 20px;
     animation: chat-scraper-panel-spin 2s linear infinite;
 }
-  
 @keyframes chat-scraper-panel-spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
