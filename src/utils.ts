@@ -31,3 +31,41 @@ export function writeJSONToNewWindow(jsonObject: any) {
     URL.revokeObjectURL(url);
   }, 1000);
 }
+
+export function downloadJSONFile(jsonObject: any) {
+  const jsonString = JSON.stringify(jsonObject, null, 2);
+  const jsonBlob = new Blob([jsonString], { type: "application/json" });
+  const downloadLink = document.createElement("a");
+  const url = URL.createObjectURL(jsonBlob);
+  downloadLink.href = url;
+  downloadLink.download = "chat-scraper-output.json";
+  downloadLink.click();
+
+  // revoke the object URL after a delay to release memory
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 5000);
+}
+
+export function addRadioInput(
+  holder: HTMLDivElement,
+  label: string,
+  name: string,
+  value: string,
+  isSelected: boolean,
+  onChange: () => void
+) {
+  const input = document.createElement("input");
+  input.type = "radio";
+  input.name = name;
+  input.value = value;
+  input.onchange = onChange;
+  input.checked = isSelected;
+  const labelElement = document.createElement("label");
+  labelElement.style.display = "flex";
+  labelElement.style.alignItems = "center";
+  labelElement.style.gap = "2px";
+  labelElement.appendChild(input);
+  labelElement.append(label);
+  holder.appendChild(labelElement);
+}

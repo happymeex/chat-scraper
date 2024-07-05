@@ -1,10 +1,14 @@
+import { addRadioInput } from "./utils";
+
 export interface ScraperPanel {
   setIdle: () => void;
   setScraping: () => void;
   setStartScrapeHandler: (handler: () => void) => void;
   setStopScrapeHandler: (handler: () => void) => void;
-  setOnDownloadHandler: (handler: () => void) => void;
-  setOnOpenInNewWindowHandler: (handler: () => void) => void;
+  setDownloadHandler: (handler: (format: "json" | "text") => void) => void;
+  setOpenInNewWindowHandler: (
+    handler: (format: "json" | "text") => void
+  ) => void;
   showExportOptions: () => void;
   setCurrentChatName: (chatName: string) => void;
   display: () => void;
@@ -28,15 +32,18 @@ export function makeScraperPanel(): ScraperPanel | null {
 class ScraperPanelUI implements ScraperPanel {
   private onStartScrape = () => {};
   private onStopScrape = () => {};
-  private onDownload = () => {};
-  private onOpenInNewWindow = () => {};
+  private onDownload = (format: "json" | "text") => {};
+  private onOpenInNewWindow = (format: "json" | "text") => {};
   private readonly panel: HTMLDivElement;
   private readonly scrapeButton: HTMLButtonElement;
   private readonly downloadButton: HTMLButtonElement;
   private readonly openInNewWindowButton: HTMLButtonElement;
   private readonly exportOptionsHolder: HTMLDivElement;
+  private readonly radioHolder: HTMLDivElement;
+  private readonly radioInputs: HTMLInputElement[] = [];
   private state: "idle" | "scraping" = "idle";
   private currentChatName: string | null = null;
+  private currentExportFormat: "json" | "text" = "text";
 
   public constructor() {
     this.panel = document.createElement("div");
@@ -78,11 +85,35 @@ class ScraperPanelUI implements ScraperPanel {
     this.openInNewWindowButton.classList.add("regular-button");
     this.exportOptionsHolder.appendChild(this.openInNewWindowButton);
 
+    this.radioHolder = document.createElement("div");
+    this.radioHolder.classList.add("radio-holder");
+    this.exportOptionsHolder.appendChild(this.radioHolder);
+    addRadioInput(
+      this.radioHolder,
+      "As text",
+      "export-format",
+      "text",
+      true,
+      () => {
+        this.currentExportFormat = "text";
+      }
+    );
+    addRadioInput(
+      this.radioHolder,
+      "As JSON",
+      "export-format",
+      "json",
+      false,
+      () => {
+        this.currentExportFormat = "json";
+      }
+    );
+
     this.downloadButton.onclick = () => {
-      this.onDownload();
+      this.onDownload(this.currentExportFormat);
     };
     this.openInNewWindowButton.onclick = () => {
-      this.onOpenInNewWindow();
+      this.onOpenInNewWindow(this.currentExportFormat);
     };
   }
 
@@ -120,11 +151,11 @@ class ScraperPanelUI implements ScraperPanel {
     this.onStopScrape = handler;
   }
 
-  public setOnDownloadHandler(handler: () => void) {
+  public setDownloadHandler(handler: (format: "json" | "text") => void) {
     this.onDownload = handler;
   }
 
-  public setOnOpenInNewWindowHandler(handler: () => void) {
+  public setOpenInNewWindowHandler(handler: (format: "json" | "text") => void) {
     this.onOpenInNewWindow = handler;
   }
 
@@ -225,6 +256,17 @@ const panelCSS = `
 }
 .chat-scraper-panel.scraping .scrape-button:hover {
     background-color: ${secondary}cc;
+}
+.chat-scraper-panel .radio-holder {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+.chat-scraper-panel .radio-holder label {
+    font-size: 1rem;
+}
+.chat-scraper-panel .radio-holder input[type="radio"]:checked {
+    background-color: ${primary};
 }
 .chat-scraper-panel .loader {
     display: block;

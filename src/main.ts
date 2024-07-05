@@ -1,5 +1,5 @@
 import { getChatNameAndMessageDiv } from "./scraper";
-import { writeJSONToNewWindow } from "./utils";
+import { downloadJSONFile, writeJSONToNewWindow } from "./utils";
 import {
   getMessageContent,
   isMessageDiv,
@@ -16,34 +16,48 @@ function main() {
   if (!panel) {
     return;
   }
-  const { startScrape, stopScrape } = scrapeFactory(
-    (chatName: string) => {
+  const { startScrape, stopScrape } = scrapeFactory({
+    handleStartScrapeUI: (chatName: string) => {
       panel.setCurrentChatName(chatName);
     },
-    () => {
+    handleStopScrapeUI: (downloader, windowOpener) => {
       panel.setIdle();
       panel.showExportOptions();
-    }
-  );
+      panel.setDownloadHandler(downloader);
+      panel.setOpenInNewWindowHandler(windowOpener);
+    },
+  });
   panel.setStartScrapeHandler(startScrape);
   panel.setStopScrapeHandler(stopScrape);
   panel.display();
 }
 
+interface ScrapeFactoryParams {
+  /**
+   * function to trigger UI changes when the system starts the scrape
+   */
+  handleStartScrapeUI: (chatName: string) => void;
+  /**
+   * function to trigger UI changes when the system finishes scraping
+   */
+  handleStopScrapeUI: (
+    downloader: (format: "json" | "text") => void,
+    windowOpener: (format: "json" | "text") => void
+  ) => void;
+}
+
 /**
- * @param handleStartScrapeUI function to be called when the system
- * initiates the scrape, in order to sync the UI
- * @param handleStopScrapeUI function to be called when the system
- * terminates the scrape, in order to sync the UI
- * @returns
+ * @param handleStartScrapeUI
+ * @param handleStopScrapeUI function to trigger UI changes
+ * when the system stops the scrape
  */
-function scrapeFactory(
-  handleStartScrapeUI: (chatName: string) => void = () => {},
-  handleStopScrapeUI: () => void = () => {}
-): {
-  /** Function to start the scrape when the user initiates it. */
+function scrapeFactory({
+  handleStartScrapeUI,
+  handleStopScrapeUI,
+}: ScrapeFactoryParams): {
+  /** Function to trigger system to scrape when the user initiates it. */
   startScrape: () => void;
-  /** Function to stop the scrape when the user terminates it. */
+  /** Function to trigger system to terminate scrape when the user stops it. */
   stopScrape: () => void;
 } {
   let chatName: string | null = null;
@@ -113,7 +127,20 @@ function scrapeFactory(
         writeJSONToNewWindow(processedMessages);
         console.log("Done!");
         clearInterval(process);
-        handleStopScrapeUI();
+        handleStopScrapeUI(
+          (format) => {
+            console.log("Downloading format", format);
+            if (format === "json") {
+              downloadJSONFile(processedMessages);
+            } else return;
+          },
+          (format) => {
+            console.log("Opening window format", format);
+            if (format === "json") {
+              writeJSONToNewWindow(processedMessages);
+            } else return;
+          }
+        );
         processedMessages = [];
         chatName = null;
       }
@@ -124,9 +151,25 @@ function scrapeFactory(
   const stopScrape = () => {
     if (scrapeProcess) {
       writeJSONToNewWindow(processedMessages);
+      const messages = processedMessages;
       console.log("Stopped scraping!");
       clearInterval(scrapeProcess);
-      handleStopScrapeUI();
+      handleStopScrapeUI(
+        (format) => {
+          console.log("Downloading format", format);
+          console.log("Number of messages: ", messages.length);
+          if (format === "json") {
+            downloadJSONFile(messages);
+          } else return;
+        },
+        (format) => {
+          console.log("Opening window format", format);
+          console.log("Number of messages: ", messages.length);
+          if (format === "json") {
+            writeJSONToNewWindow(messages);
+          } else return;
+        }
+      );
       scrapeProcess = null;
       processedMessages = [];
       chatName = null;
