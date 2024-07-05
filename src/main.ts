@@ -12,14 +12,24 @@ import { makeScraperPanel } from "./panel";
 const POLLING_TIME = 400;
 
 function main() {
-  const { startScrape, stopScrape } = scrapeFactory();
   const panel = makeScraperPanel();
+  const { startScrape, stopScrape } = scrapeFactory(() => panel.setIdle());
   panel.setStartScrapeHandler(startScrape);
   panel.setStopScrapeHandler(stopScrape);
   panel.display();
 }
 
-function scrapeFactory() {
+/**
+ * @param handleStopScrapeUI function to be called when the system (rather than the user)
+ * decides to stop the scrape, in order to sync the UI
+ * @returns
+ */
+function scrapeFactory(handleStopScrapeUI: () => void = () => {}): {
+  /** Function to start the scrape when the user initiates it. */
+  startScrape: () => void;
+  /** Function to stop the scrape when the user terminates it. */
+  stopScrape: () => void;
+} {
   let processedMessages: (Message | null)[] = [];
 
   let scrapeProcess: number | null = null;
@@ -80,10 +90,10 @@ function scrapeFactory() {
 
     const process = setInterval(() => {
       if (processLastMessage()) {
-        console.log(processedMessages);
         writeJSONToNewWindow(processedMessages);
         console.log("Done!");
         clearInterval(process);
+        handleStopScrapeUI();
       }
     }, POLLING_TIME);
     scrapeProcess = process;
