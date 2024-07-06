@@ -135,7 +135,10 @@ function scrapeFactory({
   const startScrape = () => {
     const chatNameAndMessageDiv = getChatNameAndMessageDiv();
     if (!chatNameAndMessageDiv) {
-      console.log("Chat not found!");
+      handleStopScrapeUI(
+        () => {},
+        () => {}
+      );
       return;
     }
     const { chatName: name, messageDiv } = chatNameAndMessageDiv;
