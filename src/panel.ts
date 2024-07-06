@@ -22,7 +22,7 @@ export interface ScraperPanel {
  * @return The created ScraperPanel or null if it already exists.
  */
 export function makeScraperPanel(): ScraperPanel | null {
-  const maybePanel = document.querySelector(`.${CSP}`);
+  const maybePanel = document.querySelector(`#${CSP}`);
   if (maybePanel) {
     return null;
   }
@@ -59,7 +59,7 @@ class ScraperPanelUI implements ScraperPanel {
     };
     this.panel.querySelector("h1")!.append(this.closeButton);
     this.panel.appendChild(this.scrapeButton);
-    this.panel.classList.add(CSP);
+    this.panel.id = CSP;
     this.scrapeButton.onclick = () => {
       if (this.state === "idle") {
         this.setScraping();
@@ -186,7 +186,7 @@ const offWhite = "#dfdfdf";
 const primary = "#4d9648";
 const secondary = "#994252";
 const panelCSS = `
-.${CSP} {
+#${CSP} {
     position: fixed;
     z-index: 10000;
     top: 10px;
@@ -199,35 +199,35 @@ const panelCSS = `
     max-width: 300px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
 }
-.${CSP} * {
+#${CSP} * {
     color: ${offWhite};
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
-.${CSP} h1 {
+#${CSP} h1 {
     font-size: 1.5rem;
     font-weight: bold;
     display: flex;
     justify-content: space-between;
     gap: 1.5rem;
 }
-.${CSP} .close-button {
+#${CSP} .close-button {
   color: ${borderWhite};
 }
-.${CSP} .close-button:hover {
+#${CSP} .close-button:hover {
     transition: filter 0.15s ease-in-out;
     cursor: pointer;
     filter: brightness(1.1);
 }
-.${CSP} .status-banner {
+#${CSP} .status-banner {
     display: none;
 }
-.${CSP}.scraping .status-banner {
+#${CSP}.scraping .status-banner {
     display: flex;
     justify-content: center;
     align-items: center;
     margin-top: 10px;
 }
-.${CSP} .scrape-button {
+#${CSP} .scrape-button {
     margin-top: 10px;
     background-color: ${primary};
     font-weight: bold;
@@ -238,24 +238,24 @@ const panelCSS = `
     width: 100%;
     font-size: 1rem;
 }
-.${CSP} .scrape-button:hover {
+#${CSP} .scrape-button:hover {
     transition: filter 0.15s ease-in-out;
     cursor: pointer;
     filter: brightness(1.1);
 }
-.${CSP} .options-holder {
+#${CSP} .options-holder {
     display: none;
 }
-.${CSP} .options-holder.visible {
+#${CSP} .options-holder.visible {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 8px;
 }
-.${CSP} .last-scraped-banner {
+#${CSP} .last-scraped-banner {
     margin-top: 8px;
 }
-.${CSP} .regular-button {
+#${CSP} .regular-button {
     margin-top: 10px;
     background-color: ${lightGray};
     font-weight: bold;
@@ -266,26 +266,26 @@ const panelCSS = `
     width: 100%;
     font-size: 1rem;
 }
-.${CSP} .regular-button:hover {
+#${CSP} .regular-button:hover {
     transition: filter 0.15s ease-in-out;
     cursor: pointer;
     filter: brightness(1.1);
 }
-.${CSP}.scraping .scrape-button {
+#${CSP}.scraping .scrape-button {
     background-color: ${secondary};
 }
-.${CSP} .radio-holder {
+#${CSP} .radio-holder {
     margin-top: 12px;
     display: flex;
     gap: 8px;
 }
-.${CSP} .radio-holder label {
+#${CSP} .radio-holder label {
     font-size: 1rem;
 }
-.${CSP} .radio-holder input[type="radio"]:checked {
+#${CSP} .radio-holder input[type="radio"]:checked {
     background-color: ${primary};
 }
-.${CSP} .loader {
+#${CSP} .loader {
     display: block;
     border: 4px solid ${lightGray};
     border-top: 4px solid ${medGray};
