@@ -72,6 +72,66 @@ function scrapeFactory({
   let processedMessages: (Message | null)[] = [];
 
   let scrapeProcess: number | null = null;
+  let currentDivToProcess: Element | null = null;
+
+  const trimDivCount = (messageDiv: HTMLElement, eltSet: Set<Element>) => {
+    if (messageDiv.children.length > MAX_SIMULTANEOUS_DIVS) {
+      const numDivsToRemove = MAX_SIMULTANEOUS_DIVS / 2;
+      for (let i = 0; i < numDivsToRemove; i++) {
+        const lastDiv = messageDiv.lastElementChild;
+        if (lastDiv) {
+          eltSet.delete(lastDiv);
+          messageDiv.removeChild(lastDiv);
+        }
+      }
+    }
+  };
+
+  // Returns true if should terminate, otherwise false
+  const tryMovingToPreviousSiblingMessageDiv = () => {
+    if (currentDivToProcess === null) {
+      return true;
+    }
+    const prevSibling = currentDivToProcess.previousElementSibling;
+    if (prevSibling === null) {
+      return true;
+    } else if (!isMessageDiv(prevSibling)) {
+      if (isProfileBanner(prevSibling)) {
+        return true;
+      }
+      prevSibling.scrollIntoView(false);
+      return false;
+    } else {
+      currentDivToProcess = prevSibling;
+      return false;
+    }
+  };
+
+  // Returns true if should terminate, otherwise false
+  const processLastMessage = (processedDivs: Set<Element>) => {
+    if (currentDivToProcess === null) {
+      return true;
+    }
+    const [message, status] = getMessageContent(currentDivToProcess);
+    if (
+      status === MessageParseStatus.NOT_A_MESSAGE ||
+      status === MessageParseStatus.TERMINATE
+    ) {
+      return true;
+    }
+    if (
+      status === MessageParseStatus.EMPTY_MESSAGE ||
+      processedDivs.has(currentDivToProcess)
+    ) {
+      if (tryMovingToPreviousSiblingMessageDiv()) return true;
+      return false;
+    } else {
+      processedMessages.push(message);
+      processedDivs.add(currentDivToProcess);
+      if (tryMovingToPreviousSiblingMessageDiv()) return true;
+      return false;
+    }
+  };
   const startScrape = () => {
     const chatNameAndMessageDiv = getChatNameAndMessageDiv();
     if (!chatNameAndMessageDiv) {
@@ -82,70 +142,12 @@ function scrapeFactory({
     chatName = name;
     handleStartScrapeUI(chatName);
     const processedDivs = new Set<Element>();
-    let currentDivToProcess = messageDiv.lastElementChild;
+    currentDivToProcess = messageDiv.lastElementChild;
     console.log("Scraping...");
-    // Returns true if should terminate, otherwise false
-    const tryMovingToPreviousSiblingMessageDiv = () => {
-      if (currentDivToProcess === null) {
-        return true;
-      }
-      const prevSibling = currentDivToProcess.previousElementSibling;
-      if (prevSibling === null) {
-        return true;
-      } else if (!isMessageDiv(prevSibling)) {
-        if (isProfileBanner(prevSibling)) {
-          return true;
-        }
-        prevSibling.scrollIntoView(false);
-        return false;
-      } else {
-        currentDivToProcess = prevSibling;
-        return false;
-      }
-    };
-
-    const trimDivCount = () => {
-      if (messageDiv.children.length > MAX_SIMULTANEOUS_DIVS) {
-        const numDivsToRemove = MAX_SIMULTANEOUS_DIVS / 2;
-        for (let i = 0; i < numDivsToRemove; i++) {
-          const lastDiv = messageDiv.lastElementChild;
-          if (lastDiv) {
-            processedDivs.delete(lastDiv);
-            messageDiv.removeChild(lastDiv);
-          }
-        }
-      }
-    };
-
-    // Returns true if should terminate, otherwise false
-    const processLastMessage = () => {
-      trimDivCount();
-      if (currentDivToProcess === null) {
-        return true;
-      }
-      const [message, status] = getMessageContent(currentDivToProcess);
-      if (
-        status === MessageParseStatus.NOT_A_MESSAGE ||
-        status === MessageParseStatus.TERMINATE
-      ) {
-        return true;
-      }
-      if (
-        status === MessageParseStatus.EMPTY_MESSAGE ||
-        processedDivs.has(currentDivToProcess)
-      ) {
-        if (tryMovingToPreviousSiblingMessageDiv()) return true;
-        return false;
-      } else {
-        processedMessages.push(message);
-        processedDivs.add(currentDivToProcess);
-        if (tryMovingToPreviousSiblingMessageDiv()) return true;
-        return false;
-      }
-    };
 
     const process = setInterval(() => {
-      if (processLastMessage()) {
+      trimDivCount(messageDiv, processedDivs);
+      if (processLastMessage(processedDivs)) {
         const messages = processedMessages.reverse();
         const chatNameString = chatName ?? "";
         clearInterval(process);
