@@ -146,7 +146,6 @@ function scrapeFactory({
     handleStartScrapeUI(chatName);
     const processedDivs = new Set<Element>();
     currentDivToProcess = messageDiv.lastElementChild;
-    console.log("Scraping...");
 
     const process = setInterval(() => {
       trimDivCount(messageDiv, processedDivs);
@@ -166,7 +165,6 @@ function scrapeFactory({
     if (scrapeProcess) {
       const messages = processedMessages.reverse();
       const chatNameString = chatName ?? "";
-      console.log("Stopped scraping!");
       clearInterval(scrapeProcess);
       handleStopScrapeUI(...exporterFactory(chatNameString, messages));
       scrapeProcess = null;
