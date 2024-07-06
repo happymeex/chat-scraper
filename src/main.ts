@@ -17,7 +17,8 @@ import {
 } from "./format";
 import { Exporter, MessageParseStatus, Message } from "./types";
 
-const POLLING_TIME = 50;
+const POLLING_TIME = 5;
+const MAX_SIMULTANEOUS_DIVS = 100;
 
 function main() {
   const panel = makeScraperPanel();
@@ -103,8 +104,22 @@ function scrapeFactory({
       }
     };
 
+    const trimDivCount = () => {
+      if (messageDiv.children.length > MAX_SIMULTANEOUS_DIVS) {
+        const numDivsToRemove = MAX_SIMULTANEOUS_DIVS / 2;
+        for (let i = 0; i < numDivsToRemove; i++) {
+          const lastDiv = messageDiv.lastElementChild;
+          if (lastDiv) {
+            processedDivs.delete(lastDiv);
+            messageDiv.removeChild(lastDiv);
+          }
+        }
+      }
+    };
+
     // Returns true if should terminate, otherwise false
     const processLastMessage = () => {
+      trimDivCount();
       if (currentDivToProcess === null) {
         return true;
       }

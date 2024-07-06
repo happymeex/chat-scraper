@@ -1,4 +1,4 @@
-import { Message } from "./messageParser";
+import { Message } from "./types";
 
 export function getHTMLStringFromMessageJSON(
   chatName: string,
@@ -19,7 +19,7 @@ export function getHTMLStringFromMessageJSON(
 }
 
 function getElementStringFromMessage(message: Message): string {
-  const name = `<strong>${message.senderName}</strong>`;
+  const name = `<strong>${message.sender}</strong>`;
   if (message.isImage) {
     return `<p>${name} sent an image</p>`;
   }
@@ -28,7 +28,7 @@ function getElementStringFromMessage(message: Message): string {
 
 function formatReplyInfo(replyInfo: Message["replyInfo"]): string {
   if (!replyInfo) return "";
-  return ` (replying to ${replyInfo.addresseeName}, who wrote: "${replyInfo.originalMessage}")`;
+  return ` (replying to ${replyInfo.to}, who wrote: "${replyInfo.body}")`;
 }
 
 const CSS = `
@@ -65,7 +65,7 @@ export function getRawStringFromMessageJSON(
   lines.push("Chat: " + chatName);
   lines.push("------------");
   for (const message of messages) {
-    const line = `${message.senderName}${formatReplyInfo(message.replyInfo)}: ${
+    const line = `${message.sender}${formatReplyInfo(message.replyInfo)}: ${
       message.body
     }`;
     lines.push(line);

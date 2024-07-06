@@ -10,16 +10,16 @@ export enum MessageParseStatus {
 
 export type ReplyInfo = {
   /** Name of person replied to */
-  addresseeName: string;
+  to: string;
   /** Text of message replied to (or preview thereof) */
-  originalMessage: string;
+  body: string;
 };
 
 export type Message = {
   time: string | null;
   /** Info if this message was a reply, null if not */
   replyInfo: ReplyInfo | null;
-  senderName: string;
+  sender: string;
   body: string;
   isImage: boolean;
 };

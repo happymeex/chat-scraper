@@ -44,7 +44,7 @@ export function getMessageContent(
       {
         time,
         replyInfo: null,
-        senderName: text === "You sent" ? "You" : text,
+        sender: text === "You sent" ? "You" : text,
         body: "",
         isImage: true,
       },
@@ -91,8 +91,8 @@ export function getMessageContent(
     }
 
     replyInfo = {
-      addresseeName,
-      originalMessage,
+      to: addresseeName,
+      body: originalMessage,
     };
   } else {
     if (textLabels.length === 0)
@@ -108,7 +108,7 @@ export function getMessageContent(
     {
       time,
       replyInfo,
-      senderName,
+      sender: senderName,
       body: messageBody,
       isImage: false,
     },
