@@ -41,7 +41,7 @@ class ScraperPanelUI implements ScraperPanel {
   private readonly openInNewWindowButton: HTMLButtonElement;
   private readonly exportOptionsHolder: HTMLDivElement;
   private readonly radioHolder: HTMLDivElement;
-  private readonly radioInputs: HTMLInputElement[] = [];
+  private readonly closeButton: HTMLSpanElement;
   private state: "idle" | "scraping" = "idle";
   private currentChatName: string | null = null;
   private currentExportFormat: "json" | "text" = "text";
@@ -52,6 +52,13 @@ class ScraperPanelUI implements ScraperPanel {
     this.scrapeButton.innerText = "Start scrape";
     this.scrapeButton.classList.add("scrape-button");
     this.panel.innerHTML = `<h1>Chat Scraper</h1>`;
+    this.closeButton = document.createElement("span");
+    this.closeButton.classList.add("close-button");
+    this.closeButton.innerText = "\u2715";
+    this.closeButton.onclick = () => {
+      this.remove();
+    };
+    this.panel.querySelector("h1")!.append(this.closeButton);
     this.panel.appendChild(this.scrapeButton);
     this.panel.classList.add(CSP);
     this.scrapeButton.onclick = () => {
@@ -181,7 +188,7 @@ const primary = "#4d9648";
 const secondary = "#994252";
 const panelCSS = `
 .${CSP} {
-    position: absolute;
+    position: fixed;
     z-index: 10000;
     top: 10px;
     left: 10px;
@@ -195,10 +202,22 @@ const panelCSS = `
 }
 .${CSP} * {
     color: ${offWhite};
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 .${CSP} h1 {
     font-size: 1.5rem;
     font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+.${CSP} .close-button {
+  color: ${borderWhite};
+}
+.${CSP} .close-button:hover {
+    transition: filter 0.15s ease-in-out;
+    cursor: pointer;
+    filter: brightness(1.1);
 }
 .${CSP} .status-banner {
     display: none;
