@@ -13,6 +13,7 @@ export interface ScraperPanel {
   showExportOptions: () => void;
   setCurrentChatName: (chatName: string) => void;
   display: () => void;
+  remove: () => void;
 }
 
 /**
@@ -23,8 +24,6 @@ export interface ScraperPanel {
 export function makeScraperPanel(): ScraperPanel | null {
   const maybePanel = document.querySelector(`.${CSP}`);
   if (maybePanel) {
-    maybePanel.remove();
-    document.querySelector(`.${CSP}`)?.remove();
     return null;
   }
   return new ScraperPanelUI();
