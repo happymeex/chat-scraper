@@ -1,4 +1,5 @@
 import { MessageParseStatus, Message, ReplyInfo } from "./types";
+import { sanitizeText } from "./utils";
 
 enum TextType {
   REACT_COUNT,
@@ -146,7 +147,8 @@ function getMessageTextIncompleteLabels(node: Node): TextLabel[] {
       textType === TextType.SENT_MARKER
     )
       return [];
-    return [{ type: textType, text: node.data }];
+    const text = sanitizeText(node.data);
+    return [{ type: textType, text }];
   }
   if (node instanceof Element) {
     return Array.from(node.childNodes).flatMap(getMessageTextIncompleteLabels);
