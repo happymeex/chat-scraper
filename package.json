@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "npm run bundle && node scripts/bookmarklet.mjs",
+    "build:bookmarklet": "npm run bundle && node scripts/bookmarklet.mjs",
+    "build": "npm run bundle && cp dist/main.js chrome-extension",
     "bundle": "esbuild src/main.ts --bundle --minify --outfile=dist/main.js"
   },
   "keywords": [],
