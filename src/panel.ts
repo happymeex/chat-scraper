@@ -1,4 +1,5 @@
 import { addRadioInput } from "./utils";
+import { Exporter } from "./types";
 
 const CSP = "chat-scraper-panel";
 
@@ -7,10 +8,8 @@ export interface ScraperPanel {
   setScraping: () => void;
   setStartScrapeHandler: (handler: () => void) => void;
   setStopScrapeHandler: (handler: () => void) => void;
-  setDownloadHandler: (handler: (format: "json" | "text") => void) => void;
-  setOpenInNewWindowHandler: (
-    handler: (format: "json" | "text") => void
-  ) => void;
+  setDownloadHandler: (handler: Exporter) => void;
+  setOpenInNewWindowHandler: (handler: Exporter) => void;
   showExportOptions: () => void;
   setCurrentChatName: (chatName: string) => void;
   display: () => void;

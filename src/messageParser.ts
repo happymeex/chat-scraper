@@ -1,3 +1,5 @@
+import { MessageParseStatus, Message, ReplyInfo } from "./types";
+
 enum TextType {
   REACT_COUNT,
   MESSAGE_BODY,
@@ -13,29 +15,6 @@ type TextLabel = {
   type: TextType;
   text: string;
 };
-
-type ReplyInfo = {
-  /** Name of person replied to */
-  addresseeName: string;
-  /** Text of message replied to (or preview thereof) */
-  originalMessage: string;
-};
-export type Message = {
-  time: string | null;
-  /** Info if this message was a reply, null if not */
-  replyInfo: ReplyInfo | null;
-  senderName: string;
-  body: string;
-  isImage: boolean;
-};
-
-export enum MessageParseStatus {
-  SUCCESS,
-  NOT_A_MESSAGE,
-  UNKNOWN_FORMAT,
-  EMPTY_MESSAGE,
-  TERMINATE,
-}
 
 /**
  * Retrieves the message content from a given element.

@@ -8,8 +8,6 @@ import {
 import {
   getMessageContent,
   isMessageDiv,
-  Message,
-  MessageParseStatus,
   isProfileBanner,
 } from "./messageParser";
 import { makeScraperPanel } from "./panel";
@@ -17,6 +15,7 @@ import {
   getHTMLStringFromMessageJSON,
   getRawStringFromMessageJSON,
 } from "./format";
+import { Exporter, MessageParseStatus, Message } from "./types";
 
 const POLLING_TIME = 50;
 
@@ -41,7 +40,6 @@ function main() {
   panel.display();
 }
 
-type Exporter = (format: "json" | "text") => void;
 type ScrapeFactoryParams = {
   /**
    * Function to trigger UI changes when the system starts the scrape
