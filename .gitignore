@@ -2,3 +2,4 @@ node_modules/
 dist/
 chrome-extension/main.js
 *.DS_Store
+chrome-extension.zip
