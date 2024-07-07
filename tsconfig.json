@@ -5,7 +5,8 @@
     "strict": true,
     "outDir": "./dist",
     "module": "ESNext",
-    "lib": ["DOM", "ES2020"]
+    "lib": ["DOM", "ES2020"],
+    "types": ["chrome"]
   },
   "exclude": ["./node_modules", "./dist"]
 }

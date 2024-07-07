@@ -205,4 +205,4 @@ function exporterFactory(
   return [downloader, windowOpener];
 }
 
-main();
+export default main;

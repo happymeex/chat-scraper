@@ -3,18 +3,19 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build:bookmarklet": "npm run bundle && node scripts/bookmarklet.mjs",
-    "build": "npm run bundle && cp dist/main.js chrome-extension",
-    "bundle": "esbuild src/main.ts --bundle --minify --outfile=dist/main.js"
+    "build:bookmarklet": "npm run bundle:bookmarklet && node scripts/bookmarklet.mjs",
+    "build": "npm run bundle",
+    "bundle:bookmarklet": "esbuild src/bookmarklet.ts --bundle --minify --outfile=dist/main.js",
+    "bundle": "esbuild src/chrome.ts --bundle --minify --outfile=chrome-extension/main.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
-  "dependencies": {},
   "devDependencies": {
-    "typescript": "^5.5.3",
+    "@types/chrome": "^0.0.268",
     "clipboardy": "^4.0.0",
-    "esbuild": "0.23.0"
+    "esbuild": "0.23.0",
+    "typescript": "^5.5.3"
   }
 }

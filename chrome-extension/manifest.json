@@ -8,7 +8,18 @@
     "128": "icons/128.png"
   },
   "action": {
-    "default_popup": "wrapper.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/16.png",
+      "48": "icons/48.png",
+      "128": "icons/128.png"
+    }
   },
+  "content_scripts": [
+    {
+      "matches": ["https://www.messenger.com/*"],
+      "js": ["main.js"]
+    }
+  ],
   "author": "maxwell.d.jiang@gmail.com"
 }
