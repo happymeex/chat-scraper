@@ -87,7 +87,7 @@ export function getMessageContent(
     let originalMessage = textLabels[0].text;
     textLabels.shift();
     if (textLabels[0].text === "…") {
-      originalMessage += "…";
+      originalMessage += "...";
       textLabels.shift();
     }
 
