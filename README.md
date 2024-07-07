@@ -1,6 +1,6 @@
 # Facebook Messenger Chat Scraper
 
-<img src="https://i.imgur.com/WhO0c0n.png" height="300">
+<img src="https://i.imgur.com/XULihkJ.png" height="300">
 
 Are you frustrated that Meta's End-to-End Encryption service rendered some of your chats unsearchable?
 Are you sad that some large chat histories are virtually inaccessible now?
