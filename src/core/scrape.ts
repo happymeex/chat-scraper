@@ -1,4 +1,4 @@
-import { getChatNameAndMessageDiv } from "./scraper";
+import { getChatNameAndMessageDiv } from "./dom";
 import {
   downloadJSONFile,
   downloadTextAsFile,
@@ -20,7 +20,11 @@ import { Exporter, MessageParseStatus, Message } from "./types";
 const POLLING_TIME = 5;
 const MAX_SIMULTANEOUS_DIVS = 100;
 
-function main() {
+/**
+ * Wires together all the logic for the scraper and displays the scraper UI,
+ * which is the user's interface to all functionalities of the scraper.
+ */
+function initializeScraper() {
   const panel = makeScraperPanel();
   if (!panel) {
     return;
@@ -207,4 +211,4 @@ function exporterFactory(
   return [downloader, windowOpener];
 }
 
-export default main;
+export default initializeScraper;

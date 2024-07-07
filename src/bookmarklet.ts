@@ -1,3 +1,3 @@
-import main from "./core/main";
+import initializeScraper from "./core/scrape";
 
-main();
+initializeScraper();
