@@ -21,7 +21,6 @@
       "js": ["main.js"]
     }
   ],
-  "permissions": ["activeTab"],
   "background": {
     "service_worker": "background.js"
   }
