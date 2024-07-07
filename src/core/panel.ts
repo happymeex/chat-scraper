@@ -190,7 +190,7 @@ const panelCSS = `
     position: fixed;
     z-index: 10000;
     top: 10px;
-    left: 10px;
+    right: 10px;
     border-radius: 4px;
     border: 1px solid ${borderWhite};
     background-color: ${darkGray};
