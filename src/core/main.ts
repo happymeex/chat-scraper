@@ -147,7 +147,7 @@ function scrapeFactory({
     const processedDivs = new Set<Element>();
     currentDivToProcess = messageDiv.lastElementChild;
 
-    const process = setInterval(() => {
+    const iterate = () => {
       trimDivCount(messageDiv, processedDivs);
       if (processLastMessage(processedDivs)) {
         const messages = processedMessages.reverse();
@@ -157,7 +157,9 @@ function scrapeFactory({
         processedMessages = [];
         chatName = null;
       }
-    }, POLLING_TIME);
+    };
+
+    const process = setInterval(iterate, POLLING_TIME);
     scrapeProcess = process;
   };
 
