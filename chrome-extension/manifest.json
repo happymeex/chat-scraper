@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Chat Scraper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "maxwell.d.jiang@gmail.com",
   "description": "Scrape and export chat history.",
   "icons": {
